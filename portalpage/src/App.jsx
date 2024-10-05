@@ -6,19 +6,35 @@ const ExtractPage = () => {
   const isOdd = questionNumber % 2 !== 0;
   const oddOrEvenText = isOdd ? 'Odd' : 'Even';
 
+  // State to track the correctness of the answer
+  const [isCorrect, setIsCorrect] = useState(null); // null = no answer yet, true = correct, false = incorrect
+
+  const handleCheck = () => {
+    // Simulate checking the answer; this should be replaced with actual logic
+    const correctAnswer = 'It is Even Number'; // Expected output for comparison
+    const userAnswer = document.getElementById('userAnswer').value.trim(); // Get the user input from the textarea
+
+    if (userAnswer === correctAnswer) {
+      setIsCorrect(true);
+    } else {
+      setIsCorrect(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex justify-between flex-grow p-5 bg-gray-100">
-        <div className="flex-grow bg-white p-5 rounded-md">
-          <h2 className="text-2xl font-bold mb-5">2024 Placement Programming</h2>
+        <div className="flex-grow p-5 box-border border-slate-100 border-2 h-50 w-50">
+          <h2 className="text-4xl font-thin mb-6">2024-Placement Programming</h2>
           <div className="flex">
-            <aside className="bg-white p-4 w-48 rounded-md shadow-md mr-5">
-              <p className="font-bold">Question</p>
+            {/* Question number box with margin-right for space */}
+            <aside className="bg-slate-100 p-4 w-50 box-border h-36 border-slate-200 border-2 mr-5">
+              <p>Question <span className='font-semibold'>1</span></p>
               <p className="mt-3">Not complete</p>
               <p>Marked out of 10.00</p>
             </aside>
 
-            <div className="flex-1 bg-blue-100 p-5 rounded-md">
+            <div className="flex-1 bg-blue-100 p-5">
               <p>Check Whether the given number is ODD or EVEN</p>
               <h3 className="font-bold mt-4">Input Format</h3>
               <p>N -integers </p>
@@ -30,27 +46,48 @@ const ExtractPage = () => {
               <p>It is Even Number</p>
 
               <div className="mt-2">
-                <label htmlFor="answer" className="block font-bold">Answer:</label>
-                <select id="language" defaultValue="java" className="mt-3 p-2 w-[10%] border rounded">
+                <span className='font-semibold'>Language: </span>
+                <select id="language" defaultValue="c" className="mt-3 p-2 w-[10%] border rounded">
                   <option value="c">c</option>
                   <option value="cpp">cpp</option>
                   <option value="java">java</option>
                   <option value="python3">python3</option>
                 </select>
-                <textarea rows="10" placeholder="Enter your code here..." className="mt-3 p-3 w-full border rounded"></textarea>
-                <button className="bg-green-500 text-white p-3 mt-3 rounded-md">Check</button>
+                <textarea
+                  id="userAnswer"
+                  rows="10"
+                  placeholder="Enter your code here..."
+                  className="mt-3 p-3 w-full border rounded"
+                ></textarea>
+                <button
+                  onClick={handleCheck}
+                  className="bg-green-500 text-white p-3 mt-3 rounded-md"
+                >
+                  Check
+                </button>
               </div>
+
+              {/* Result Box */}
+              {isCorrect !== null && (
+                <div
+                  className={`mt-5 p-4 text-white font-bold ${
+                    isCorrect ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                >
+                  {isCorrect ? 'Passed all tests!' : 'Failed some tests!'}
+                </div>
+              )}
             </div>
 
             {/* Medium-Sized Test Case Section */}
-            <div className="ml-5"> 
-              <aside className="bg-white p-4 w-60 rounded-md shadow-md">
+            <div className="ml-5">
+              <aside className="bg-slate-100 p-4 w-60 box-border h-36 border-slate-200 border-2">
                 <p className="font-bold">Quiz Navigation</p>
                 <div className="flex flex-wrap mt-3 space-x-2">
                   <button className="bg-gray-300 p-2 rounded">1</button>
                   <button className="bg-gray-300 p-2 rounded">2</button>
                 </div>
-                <button className="text-green-500 mt-3 w-full bg-gray-100 p-2 rounded-md">Finish attempt ...</button>
+                <button className="text-green-500 mt-3">Finish attempt</button>
               </aside>
             </div>
           </div>
