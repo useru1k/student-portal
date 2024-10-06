@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Code Compiler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        select, button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        pre {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <!-- <div class="container">
+        <h1>Online Code Compiler</h1>
+        <textarea id="code" placeholder="Write your Python code here..."></textarea>
+        <select id="language">
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+        </select>
+        <button onclick="submitCode()">Run Code</button>
+        <h2>Output:</h2>
+        <pre id="output"></pre>
+    </div>
+
+    <script>
+        function submitCode() {
+            const code = document.getElementById('code').value;
+            const language = document.getElementById('language').value;
+            
+            // Sending code to the server for compilation
+            fetch('http://localhost:3000/compile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language })
+            })
+            .then(response => response.text())
+            .then(output => {
+                document.getElementById('output').innerText = output;
+            })
+            .catch(err => {
+                document.getElementById('output').innerText = 'Error: ' + err.message;
+            });
+        }
+    </script> -->
+
+    <h1>Code Compiler</h1>
+    <textarea id="code" rows="10" cols="30" placeholder="Enter your code here..."></textarea><br>
+    <select id="language">
+        <option value="python3">Python</option>
+        <option value="java">Java</option>
+        <option value="c">c</option>
+        <option value="cpp">cpp</option>
+    </select>
+    <br>
+    <button onclick="compileCode()">Compile and Run</button>
+
+    <h2>Output:</h2>
+    <pre id="output"></pre>
+
+    <script>
+        async function compileCode() {
+            const code = document.getElementById('code').value;
+            const language = document.getElementById('language').value;
+            console.log('Received language:', language); 
+
+
+            const response = await fetch('http://localhost:3000/compile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code, language })
+            });
+
+            const result = await response.text();
+            document.getElementById('output').innerText = result;
+        }
+    </script>
+
+</body>
+</html>
