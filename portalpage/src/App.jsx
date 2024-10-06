@@ -105,7 +105,7 @@ const ExtractPage = () => {
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
               className="bg-gray-500 text-white p-3"
-            >
+            > 
               Previous
             </button>
             <button
