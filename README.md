@@ -1,4 +1,4 @@
-# Portal
+# Student Portal
 * FrontEnd
     * Task 1 : Navbar (Completed).
     * Task 2 : Student and Admin Login (Completed) Remark : Need to change the color.
