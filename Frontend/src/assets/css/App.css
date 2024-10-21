@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body, html {
+    margin: 0;
+    padding: 0;
+  }
+  
+/* Add this CSS to your stylesheet or <style> tag */
+@keyframes fire {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+.fire-effect {
+  @apply w-2 h-2 rounded-full bg-gradient-to-r from-red-400 to-yellow-500 absolute;
+  animation: fire 1s infinite ease-in-out;
+}
