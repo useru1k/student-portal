@@ -1,32 +1,45 @@
-// import Output from '../components/Output'
-import Answer from '../components/Answer'
-import Question from '../components/Question'
-// import Language from '../components/Language'
-import Navbar from '../components/Navbar'
+import React, { useState } from "react";
+import Answer from "../components/Answer";
+import Question from "../components/Question";
+import Navbar from "../components/Navbar";
+
 const Editor = () => {
+  const [language, setLanguage] = useState("python");
+  const [code, setCode] = useState("// Write your code here...");
+
+  const handleLanguageChange = (selectedLanguage) => {
+    setLanguage(selectedLanguage);
+    console.log("Selected language:", selectedLanguage);
+  };
+
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+  };
+
   return (
     <>
-       <Navbar/>
+      <Navbar
+        language={language}
+        streakCount={1}
+        onLanguageChange={handleLanguageChange}
+      />
       <div className="flex w-full h-screen p-0">
-        <div className="w-[40%] h-[125%] pt-56 p-1">
+        <div className="h-full p-1">
           <Question />
         </div>
-        
-        <div className="w-[70%] flex flex-col p-5">
-          <div>
-            {/* <Language/> */}
+        <div className="w-[70%] flex flex-col p-1">
+          <div className="h-[70%] pt-1">
+            <Answer
+              currentIndex={0}
+              language={language}
+              code={code}
+              onCodeChange={handleCodeChange}
+            />
           </div>
-          <div className=" h-[10%]  pt-56">
-            <Answer />
-          </div>
-       
-          {/* <div className="h-[30%] p-2">
-            <Output />
-          </div> */}
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Editor
+export default Editor;
