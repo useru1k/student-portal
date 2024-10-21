@@ -1,108 +1,87 @@
-import React, { useState } from 'react';
-import { Editor as MonacoEditor } from '@monaco-editor/react';
-import { FaPlay, FaCheckCircle } from 'react-icons/fa';
-import '../assets/css/Answer.css'; // Import the CSS file for layout and styling
+import React, { useState, useEffect } from "react";
+import { Editor as MonacoEditor } from "@monaco-editor/react";
+import { MdOutlineArrowUpward, MdOutlineArrowDownward } from "react-icons/md";
+import { FaPlay, FaSun, FaMoon } from "react-icons/fa";
+import "../assets/css/Answer.css";
 
-const Answer = () => {
-  const [code, setCode] = useState('// Write your code here...');
-  const [language, setLanguage] = useState('javascript');
-  const [theme, setTheme] = useState('vs-dark');
+const Answer = ({ currentIndex, language, code, onCodeChange }) => {
+  const [theme, setTheme] = useState("vs-dark");
   const [showOutput, setShowOutput] = useState(false);
-  const [testResult, setTestResult] = useState(null); // For test case results
+  const [customInput, setCustomInput] = useState("");
+  const [expectedOutput, setExpectedOutput] = useState("5,10,15");
+  const [gotOutput, setGotOutput] = useState("");
+  const [compilationMessage, setCompilationMessage] = useState("");
 
-  const handleCompile = () => {
-    setShowOutput(true); // Show output when "Run Code" is clicked
-    const result = 'Wrong Answer'; // Simulate result (or get dynamically)
-    setTestResult({
-      status: result === 'Correct' ? 'Correct Answer' : 'Wrong Answer',
-      message: result,
-      testCase: 'Sample Test case 0',
-      output: result === 'Correct' ? 'Expected Output' : 'Incorrect Output',
-    });
-  };
+  const compileCode = async () => {
+    setShowOutput(true);
+    setGotOutput("");
+    setCompilationMessage("");
 
-  const handleSubmit = () => {
-    console.log('Submitting code:', code);
+    try {
+      const response = await fetch("http://localhost:3000/compile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+      }
+      const result_1 = await response.text();
+      console.log(result_1)
+      document.getElementById("hee").innerText = result_1;
+    } catch (error) {
+      setCompilationMessage(`Error: ${error.message}`);
+    }
   };
 
   return (
-    <div className="container ">
-      {/* Top bar: Language selector and theme toggle */}
-      <div className="top-bar">
-        <div className="flex space-x-6 items-center">
-          <button
-            className="toggle-theme"
-            onClick={() => setTheme(theme === 'vs-dark' ? 'light' : 'vs-dark')}
-          >
-            {theme === 'vs-dark' ? 'Light' : 'Dark'}
-          </button>
-          <div className="flex font-thin items-center space-x-2">
-            <span className="text-sm">Language</span>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="language-selector"
-            >
-              <option value="javascript">JavaScript</option>
-              <option value="python">Python 3</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
-            </select>
-          </div>
-        </div>
+    <div className="container mx-auto p-4">
+      <div className="top-bar mb-4 flex justify-between items-center">
+        <button
+          className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center"
+          onClick={() =>
+            setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"))
+          }
+        >
+          {theme === "vs-dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
+        </button>
+        
       </div>
 
-      {/* Monaco Editor */}
-      <div className={`editor-container`}>
+      <div className="editor-container mb-4 border border-gray-300 rounded-md shadow-lg">
         <MonacoEditor
-          height="100%"
+          height="400px"
           width="100%"
           defaultLanguage={language}
           theme={theme}
           value={code}
-          onChange={(value) => setCode(value || '')}
+          onChange={(value) => onCodeChange(value || "")} 
           options={{
-            lineNumbers: 'on',
+            lineNumbers: "on",
             tabSize: 2,
-            wordWrap: 'on',
+            wordWrap: "on",
             automaticLayout: true,
           }}
-          className="rounded-md"
         />
       </div>
 
-      {/* Bottom controls: Run and Submit buttons */}
-      <div className="controls">
+      <div className="controls mb-6 flex space-x-2">
         <button
-          className="btn-run"
-          onClick={handleCompile}
+          className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
+          onClick={compileCode}
         >
           <FaPlay />
-          <span>Run Code</span>
-        </button>
-        <button
-          className="btn-submit"
-          onClick={handleSubmit}
-        >
-          <FaCheckCircle />
-          <span>Submit Code</span>
+          <span>Run</span>
         </button>
       </div>
 
-      {/* Output Panel */}
       {showOutput && (
-        <div className="output-panel">
-          <div className="output-header">
-            <h3 className={testResult?.status === 'Correct Answer' ? 'text-green' : 'text-red'}>
-              {testResult?.status}
-            </h3>
-            <p>{testResult?.message}</p>
-            <p className="text-sm">{testResult?.testCase}</p>
-          </div>
-          <div className="output-content">
-            <p className="font-mono text-sm text-red-500">Compiler Message</p>
-            <pre>{testResult?.output}</pre>
-          </div>
+        <div className="output-section mt-4">
+          <h3>Output:</h3>
+          <pre id="hee"></pre>
+          <p>{compilationMessage}</p>
         </div>
       )}
     </div>
