@@ -31,17 +31,12 @@ const Navbar = ({ language, onLanguageChange, streakCount }) => {
 
       <div className="flex items-center relative">
         <div className="flex items-center space-x-1  rounded-full py-1 px-2 ">
-          <FaFire className="text-yellow-500 w-5 h-5" />
+          <FaFire className="text-yellow-500 w-6 h-6" />
           <span className="text-yellow-400 font-bold text-lg">
             {streakCount}
           </span>
         </div>
-        <div>
-          <button id = "button-run"
-          className="btn-run bg-green-500 text-white py-1 px-2 rounded-sm flex items-center space-x-1 text-sm">
-            Run
-          </button>
-        </div>
+        
         <select
           value={language}
           onChange={(e) => onLanguageChange(e.target.value)}
