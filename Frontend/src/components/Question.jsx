@@ -3,7 +3,6 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'; // Import arrow icon
 import Question1 from './Question1';
 import Question2 from './Question2';
 
-
 const Question = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timers, setTimers] = useState([30, 30]); // Array to store remaining time for each question
@@ -12,10 +11,7 @@ const Question = () => {
   const questions = [<Question1 />, <Question2 />]; // Array of question components
 
   useEffect(() => {
-    // Clear previous timer when switching questions
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
+    if (timerRef.current) clearInterval(timerRef.current);
 
     // Start the timer for the current question
     timerRef.current = setInterval(() => {
@@ -56,10 +52,11 @@ const Question = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen">
-      <div className="bg-gray-800 w-full max-w-md rounded-lg p-5 flex flex-col justify-between mt-1"> {/* Adjusted width and height */}
+    <div className="relative drop-shadow-xl w-[400px] h-[535px] overflow-hidden rounded-xl bg-[#3d3c3d] flex items-center justify-center">
+      <div className="absolute w-56 h-56 bg-white blur-[50px]"></div>
+      <div className="absolute flex flex-col items-center justify-between text-white z-[1] opacity-90 rounded-xl inset-0.5 bg-[#323132] w-full pt-3 px-6 pb-2">
         {/* Timer and Score Display */}
-        <div>
+        <div className="w-full">
           <div className="flex justify-between mb-4 items-center">
             {/* Timer Display */}
             <div
@@ -69,21 +66,20 @@ const Question = () => {
             >
               Time Left: {formatTime(timers[currentIndex])}
             </div>
-  
             {/* Score Display */}
             <div className="text-white text-sm text-center py-1 px-3 rounded-full bg-gray-700">
               Score: 0.0 / 10
             </div>
           </div>
-  
+
           {/* Render the current question component */}
-          <div className="question-content overflow-y-auto mb-4 h-[70%]"> {/* Added height for scrollable area */}
+          <div className="question-content overflow-y-auto mb-2 h-[350px] w-full text-sm">
             {questions[currentIndex]}
           </div>
         </div>
-  
-        {/* Navigation (always displayed for both Question 1 and Question 2) */}
-        <div className="mt-4 flex items-center justify-center">
+
+        {/* Navigation */}
+        <div className="flex items-center justify-center w-full absolute bottom-0 mb-2">
           {/* Previous Arrow */}
           <button
             type="button"
@@ -93,7 +89,7 @@ const Question = () => {
           >
             <FaArrowLeft />
           </button>
-  
+
           {/* Question Navigation */}
           <div className="flex justify-center items-center">
             {questions.map((_, index) => (
@@ -108,7 +104,7 @@ const Question = () => {
               </button>
             ))}
           </div>
-  
+
           {/* Next Arrow */}
           <button
             type="button"
@@ -120,45 +116,26 @@ const Question = () => {
           </button>
         </div>
       </div>
-  
+
       <style jsx>{`
         .question-content {
           color: white;
-          font-weight: 300; /* Thinner font weight */
-          font-size: 14px; /* Adjusted base font size */
-          line-height: 1.6; /* Added line height for better readability */
-          overflow-y: auto; /* Scrollbar when content overflows */
+          font-weight: 300;
+          font-size: 14px;
+          line-height: 1.6;
+          overflow-y: auto;
         }
-  
-        /* Hide scrollbar */
+
         .question-content::-webkit-scrollbar {
-          display: none; /* Hide scrollbar for webkit browsers */
+          display: none;
         }
-  
-        /* Customize different text styles */
-        .question-content h1,
-        .question-content h2,
-        .question-content h3 {
-          font-weight: 600; /* Bold titles */
-          font-size: 24px; /* Slightly larger for headers */
-        }
-  
-        .question-content p {
-          font-weight: 300; /* Thin font for paragraphs */
-        }
-  
-        .question-content ul,
-        .question-content ol {
-          margin-left: 1.5rem; /* Indented lists */
-        }
-  
-        /* Additional styling for smaller numbered navigation */
+
         button {
-          transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
+          transition: all 0.3s ease-in-out;
         }
-  
+
         button:hover {
-          transform: scale(1.1); /* Slight scaling on hover */
+          transform: scale(1.1);
         }
       `}</style>
     </div>
