@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 
 const Editor = () => {
   const [language, setLanguage] = useState("python"); // Default language
-  const [code, setCode] = useState("// Write your code here..."); // Initial code state
+ // const [code, setCode] = useState("// Write your code here..."); // Initial code state
 
   const handleLanguageChange = (selectedLanguage) => {
     setLanguage(selectedLanguage);
@@ -32,7 +32,6 @@ const Editor = () => {
             <Answer
               currentIndex={0}
               language={language}
-              code={code}
               onCodeChange={handleCodeChange}
             />
           </div>
