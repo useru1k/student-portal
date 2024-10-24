@@ -7,6 +7,6 @@
     * Task 5 : Admin DashBoard (Partially Completed)
 * BackEnd
     * Task 1 : Time control (Compeleted) Remark : Need to combine with FrontEnd. (Completed)
-    * Task 2 : Compile work (Completed) Remark : Compile work run with API but not on client work.(No need) - Completed.
+    * Task 2 : Compile work (Completed) Remark : Compile work run with API but not on client work.(No need) - (Need to spilt into 3)
     * Task 3 : Get the Environmental Path (Completed) Remark : Can not do in client side but get by API.(No need it runs on server).
     * Task 4 : DB Schema : Question page Schema is Completed. Remark : Need to integrated with client.
