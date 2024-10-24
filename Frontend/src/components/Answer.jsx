@@ -1,9 +1,8 @@
-import React, { useState,useRef,useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { FaPlay, FaSun, FaMoon } from "react-icons/fa";
 import "../assets/css/Answer.css";
-
-const Answer = ({ currentIndex, language, code, onCodeChange }) => {
+const Answer = ({ currentIndex, language, onCodeChange }) => {
   const [theme, setTheme] = useState("vs-dark");
   const [showOutput, setShowOutput] = useState(false); // To track if output should be shown
   const [customInput, setCustomInput] = useState("");
@@ -11,85 +10,86 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
   const [gotOutput, setGotOutput] = useState("");
   const [compilationMessage, setCompilationMessage] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false); // State for custom input checkbox
+  const [code, setCode] = useState(""); // State for the editor's code
   const editorRef = useRef(null);
 
+  // Disable clipboard actions (copy, cut, paste)
   useEffect(() => {
-  const handleClipboardEvent = (e) => {
-    e.preventDefault();
-    alert(`Clipboard action (${e.type}) is disabled`);
-  };
+    const handleClipboardEvent = (e) => {
+      e.preventDefault();
+      alert(`Clipboard action (${e.type}) is disabled`);
+    };
 
-  document.addEventListener("copy", handleClipboardEvent);
-  document.addEventListener("cut", handleClipboardEvent);
-  document.addEventListener("paste", handleClipboardEvent);
+    document.addEventListener("copy", handleClipboardEvent);
+    document.addEventListener("cut", handleClipboardEvent);
+    document.addEventListener("paste", handleClipboardEvent);
 
-  return () => {
-    document.removeEventListener("copy", handleClipboardEvent);
-    document.removeEventListener("cut", handleClipboardEvent);
-    document.removeEventListener("paste", handleClipboardEvent);
-  };
-}, []);
+    return () => {
+      document.removeEventListener("copy", handleClipboardEvent);
+      document.removeEventListener("cut", handleClipboardEvent);
+      document.removeEventListener("paste", handleClipboardEvent);
+    };
+  }, []);
 
+  // Disable keyboard shortcuts for clipboard actions
   useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (
-      (e.ctrlKey || e.metaKey) && 
-      (e.key === 'c' || e.key === 'x' || e.key === 'v')
-    ) {
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === 'c' || e.key === 'x' || e.key === 'v')
+      ) {
+        e.preventDefault();
+        alert("Clipboard actions (copy, cut, paste) are disabled");
+      }
+      if (e.key === 'Insert' || (e.key === 'Delete' && e.shiftKey)) {
+        e.preventDefault();
+        alert("Alternative clipboard actions are disabled");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // Disable drag-and-drop and context menu in the Monaco Editor
+  const handleEditorDidMount = (editor, monaco) => {
+    editorRef.current = editor;
+
+    // Disable cut, copy, and paste in the editor
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {
+      alert("Copy is disabled");
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_X, () => {
+      alert("Cut is disabled");
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V, () => {
+      alert("Paste is disabled");
+    });
+
+    // Disable right-click context menu
+    editor.onContextMenu((e) => {
       e.preventDefault();
-      alert("Clipboard actions (copy, cut, paste) are disabled");
-    }
-    if (
-      e.key === 'Insert' || e.key === 'Delete' || e.key === 'Insert' && e.shiftKey
-    ) {
+      alert("Right-click context menu is disabled");
+    });
+
+    // Disable drag-and-drop in the editor
+    const editorContainer = editor.getDomNode().parentElement;
+    editorContainer.addEventListener("dragover", (e) => {
       e.preventDefault();
-      alert("Alternative clipboard actions are disabled");
-    }
+      alert("Drag-and-drop is disabled");
+    });
+    editorContainer.addEventListener("drop", (e) => {
+      e.preventDefault();
+      alert("Drag-and-drop is disabled");
+    });
+
+    editor.updateOptions({ contextmenu: false }); // Disable context menu option
   };
 
-  window.addEventListener("keydown", handleKeyDown);
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, []);
-
-const handleEditorDidMount = (editor, monaco) => {
-  editorRef.current = editor;
-
-  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {
-    alert("Copy is disabled");
-  });
-
-  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_X, () => {
-    alert("Cut is disabled");
-  });
-
-  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V, () => {
-    alert("Paste is disabled");
-  });
-
-  editor.onContextMenu((e) => {
-    e.preventDefault();
-    alert("Right-click context menu is disabled");
-  });
-
-  const editorContainer = editor.getDomNode().parentElement; 
-  editorContainer.addEventListener('dragover', (e) => {
-    e.preventDefault(); 
-    alert("Drag-and-drop is disabled");
-  });
-
-  editorContainer.addEventListener('drop', (e) => {
-    e.preventDefault(); 
-    alert("Drag-and-drop is disabled");
-  });
-  editor.onContextMenu((e)=>{
-    e.preventDefault();
-    alert("Right Click Disabled");
-  });
-  editor.updateOptions({contextmenu:false});
-};
+  // Compilation function
   const compileCode = async () => {
     setShowOutput(true); // Show the output panel when compiling
     setGotOutput("Compiling..."); // Show a message indicating compilation is in progress
@@ -109,23 +109,21 @@ const handleEditorDidMount = (editor, monaco) => {
       const result = await response.text();
       setGotOutput(result); // Set the result in Got Output field
     } catch (error) {
-      setGotOutput(`Error: ${error.message}`); // Show error in Got Output
+      setGotOutput(`Error:${error}`); // Show error in Got Output
       setCompilationMessage(`Compilation failed: ${error.message}`); // Show compilation message
     }
   };
 
   return (
-    <div className="container mx-auto p-4"
-    onContextMenu={(e)=>
-    {
-      e.preventDefault();
-      alert("Right-click disabled");
-    }
-    }
+    <div
+      className="container mx-auto p-4 flex flex-col space-y-4 h-[90vh]"
+      onContextMenu={(e) => {
+        e.preventDefault();
+        alert("Right-click disabled");
+      }} // Disable right-click globally
     >
-    <div className="container mx-auto p-4">
-      <div className="top-bar mb-4 flex justify-between items-center">
-        {/* Theme Toggle */}
+      {/* Top bar with Theme and Run button */}
+      <div className="top-bar mb-2 flex justify-between items-center">
         <button
           className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center mr-2"
           onClick={() =>
@@ -135,8 +133,6 @@ const handleEditorDidMount = (editor, monaco) => {
           {theme === "vs-dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
         </button>
 
-       
-        {/* Run Button */}
         <button
           className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
           onClick={compileCode}
@@ -146,13 +142,15 @@ const handleEditorDidMount = (editor, monaco) => {
         </button>
       </div>
 
-      <div className="editor-container mb-4 border border-gray-300 rounded-md shadow-lg">
+      {/* Monaco Editor */}
+      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[60%] overflow-hidden">
         <MonacoEditor
-          height="400px"
+          height="100%"
           width="100%"
           defaultLanguage={language}
           theme={theme}
           value={code}
+          onChange={(newCode) => setCode(newCode)} // Update the code on change
           onMount={handleEditorDidMount}
           options={{
             lineNumbers: "on",
@@ -162,25 +160,28 @@ const handleEditorDidMount = (editor, monaco) => {
           }}
         />
       </div>
-      </div>
-      <div className="controls mb-6 flex items-center space-x-2">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            checked={useCustomInput}
-            onChange={() => setUseCustomInput(!useCustomInput)}
-            className="mr-2"
-          />
-          Use Custom Input
-        </label>
-      </div>
 
+      {/* Output Section */}
       {showOutput && (
-        <div className="output-section mt-4 border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 mx-auto">
+        <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
+          <div className="controls mb-4 flex items-center space-x-2">
+            <label className="flex items-center text-white">
+              <input
+                type="checkbox"
+                checked={useCustomInput}
+                onChange={() => setUseCustomInput(!useCustomInput)}
+                className="mr-2"
+              />
+              Use Custom Input
+            </label>
+          </div>
+
           <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
-                {useCustomInput && <th className="w-1/3 p-2">Custom Input</th>}
+                {useCustomInput && (
+                  <th className="w-1/3 p-2">Custom Input</th>
+                )}
                 <th className="w-1/3 p-2">Expected Output</th>
                 <th className="w-1/3 p-2">Got Output</th>
               </tr>
