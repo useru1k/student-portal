@@ -19,13 +19,32 @@ const eventsData = [
     date: 'November 1, 2024',
     time: '11:00 AM - 1:00 PM',
   },
+  {
+    id: 1,
+    title: 'Web Development Test-I',
+    date: 'October 20, 2024',
+    time: '10:00 AM - 2:00 PM',
+  },
+  {
+    id: 2,
+    title: 'Data Science Exit Test-II',
+    date: 'October 25, 2024',
+    time: '3:00 PM - 4:30 PM',
+  },
+  {
+    id: 3,
+    title: 'CTF',
+    date: 'November 1, 2024',
+    time: '11:00 AM - 1:00 PM',
+  },
+  // Add more events here as needed
 ];
 
 const UpcomingEvents = () => {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
-      <div className="bg-white shadow-md rounded-lg p-4 space-y-4">
+      <div className="bg-white shadow-md rounded-lg p-4 max-h-96 overflow-y-auto space-y-4 custom-scroll">
         {eventsData.map(event => (
           <div key={event.id} className="border-b pb-4">
             <h3 className="text-lg font-semibold">{event.title}</h3>

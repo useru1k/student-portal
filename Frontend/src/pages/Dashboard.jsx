@@ -1,50 +1,63 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import TopNav from '../components/TopNav';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import SideNav from '../components/SideNav';
-import Courses from './Courses'; 
-import Profile from './Profile';
+import TopNav from '../components/TopNav';
+import Courses from './Courses';
 import UpcomingEvents from './UpcomingEvents';
-import Leaderboard from './LeaderBoard';
-import SietHome from './SietHome'; 
-import LoginAdmin from './LoginAdmin';
+import LeaderBoard from './LeaderBoard';
+import Profile from './Profile';
+import SietHome from './SietHome';
 import Modules from './Modules';
 import TestAttempt from './TestAttempt';
+import Editor from './Editor';
 
 const Dashboard = () => {
-  const [isSideNavOpen, setSideNavOpen] = useState(false); // Manages the toggle state
+  const [isSideNavOpen, setIsSideNavOpen] = useState(true);
+  const location = useLocation();
+
+  // Check if the current route is the editor route
+  const isEditorRoute = location.pathname.includes('/editor');
 
   const toggleSideNav = () => {
-    setSideNavOpen(!isSideNavOpen); // Toggles the sidebar state
+    setIsSideNavOpen(!isSideNavOpen);
   };
 
   return (
-    <Router>
-      <div>
-        {/* Conditionally render TopNav and SideNav based on the route */}
-        <Routes>
-          <Route path="/" element={<LoginAdmin />} />
-          <Route path="*" element={
-            <>
-              <TopNav isSideNavOpen={isSideNavOpen} toggleSideNav={toggleSideNav} />
-              <SideNav isOpen={isSideNavOpen} /> {/* Passes the sidebar open/close state */}
-              <div className={`p-8 mt-16 ${isSideNavOpen ? 'ml-64' : 'ml-0'} transition-all`}>
-                <Routes>
-                  <Route path="/courses" element={<Courses />} /> {/* Set Courses as root */}
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/upcomingevents" element={<UpcomingEvents />} />
-                  <Route path="/leaderboard" element={<Leaderboard />} />
-                  <Route path="/siethome" element={<SietHome />} />
-                  <Route path="/modules/:courseId" element={<Modules />} />
-                  <Route path="/test/:testId" element={<TestAttempt />} />
+    <div className="relative">
+      {/* Conditionally render TopNav and SideNav if not in the Editor route */}
+      {!isEditorRoute && (
+        <>
+          {/* Fixed TopNav */}
+          <TopNav toggleSideNav={toggleSideNav} />
 
+          {/* Flex layout for SideNav and Main Content */}
+          <div className="flex h-screen">
+            {/* SideNav with toggleable state */}
+            <SideNav isOpen={isSideNavOpen} />
+            
+            {/* Content area, which adjusts based on the SideNav state */}
+            <div className={`flex-grow transition-all duration-300 ${isSideNavOpen ? 'ml-64' : 'ml-0'} mt-16`}>
+              <div className="p-6">
+                <Routes>
+                  <Route path="*" element={<Courses />} />
+                  <Route path="courses" element={<Courses />} />
+                  <Route path="upcomingevents" element={<UpcomingEvents />} />
+                  <Route path="leaderboard" element={<LeaderBoard />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="siethome" element={<SietHome />} />
+                  <Route path="courses/modules/:courseId" element={<Modules />} />
+                  <Route path="courses/modules/test/:testId" element={<TestAttempt />} />
+                  {/* Removed direct routing to Editor */}
                 </Routes>
               </div>
-            </>
-          } />
-        </Routes>
-      </div>
-    </Router>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Render only the Editor without TopNav and SideNav if on the editor route */}
+      {isEditorRoute && <Editor />}
+    </div>
   );
 };
 
