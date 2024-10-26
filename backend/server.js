@@ -4,19 +4,31 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const os = require('os');
+const sendEmail = require('./sendEmail'); 
 
 const app = express();
 const PORT = 3000;
+const MONITOR_PORT = 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-//compiling and executing code
+const checkMemoryUsage = async () => {
+    try {
+        const response = await axios.get(`http://localhost:${MONITOR_PORT}/monitor`);
+        console.log(response.data);
+    } catch (error) {
+        console.error('Error checking memory usage:', error);
+    }
+};
+
 app.post('/compile', (req, res) => {
     const { code, language } = req.body;
     console.log('Received code:', code);
-    console.log('Received language:', language); 
+    console.log('Received language:', language);
 
     if (language === 'python') {
         const fileName = 'TempCode.py';
@@ -74,20 +86,17 @@ app.post('/compile', (req, res) => {
         fs.writeFile(filePath, code, (err) => {
             if (err) return res.status(500).send('Error writing C file: ' + err.message);
 
-            // Compile C code
             exec(`gcc ${filePath} -o ${outputFilePath}`, (compileErr, compileStdout, compileStderr) => {
                 if (compileErr) {
                     return res.status(400).send(`C Compilation Error: ${compileStderr}`);
                 }
 
-                // Run compiled C program
                 exec(outputFilePath, (runErr, runStdout, runStderr) => {
                     if (runErr) {
                         return res.status(400).send(`C Execution Error: ${runStderr}`);
                     }
                     res.send(runStdout);
 
-                    // Cleanup
                     fs.unlink(filePath, (unlinkErr) => {
                         if (unlinkErr) console.error('Error cleaning up C file:', unlinkErr);
                     });
@@ -105,20 +114,17 @@ app.post('/compile', (req, res) => {
         fs.writeFile(filePath, code, (err) => {
             if (err) return res.status(500).send('Error writing C++ file: ' + err.message);
 
-            // Compile C++ code
             exec(`g++ ${filePath} -o ${outputFilePath}`, (compileErr, compileStdout, compileStderr) => {
                 if (compileErr) {
                     return res.status(400).send(`C++ Compilation Error: ${compileStderr}`);
                 }
 
-                // Run compiled C++ program
                 exec(outputFilePath, (runErr, runStdout, runStderr) => {
                     if (runErr) {
                         return res.status(400).send(`C++ Execution Error: ${runStderr}`);
                     }
                     res.send(runStdout);
 
-                    // Cleanup
                     fs.unlink(filePath, (unlinkErr) => {
                         if (unlinkErr) console.error('Error cleaning up C++ file:', unlinkErr);
                     });
@@ -132,6 +138,64 @@ app.post('/compile', (req, res) => {
         res.status(400).send('Unsupported language');
     }
 });
+
+const monitorApp = express();
+
+monitorApp.use(express.json());
+monitorApp.get('/monitor', (req, res) => {
+    const memoryUsage = process.memoryUsage();
+    const cpuUsage = process.cpuUsage();
+    const memoryThresholdPercentage = 80;
+    const cpuUsageThresholdPercentage = 80;
+    const totalMemory = os.totalmem();
+    const memoryThreshold = (memoryThresholdPercentage / 100) * totalMemory;
+    console.log(`Current Memory Usage: ${memoryUsage.heapUsed} bytes`);
+
+    let memoryAlert = false;
+    let cpuAlert = false;
+    if (memoryUsage.heapUsed > memoryThreshold) {
+        console.log('Memory usage exceeded threshold, sending alert email...');
+        sendEmail(
+            'High Memory Usage Alert',
+            `Memory usage is high: ${memoryUsage.heapUsed} bytes (${((memoryUsage.heapUsed / totalMemory) * 100).toFixed(2)}% of total memory)`
+        );
+
+        memoryAlert = true;
+    }
+
+    const currentCpuUsage = ((cpuUsage.user + cpuUsage.system) / (os.cpus().length * 1e6)) * 100;
+    console.log(`Current CPU Usage: ${currentCpuUsage.toFixed(2)}%`);
+    if (currentCpuUsage > cpuUsageThresholdPercentage) {
+        console.log('CPU usage exceeded limit, sending alert email...');
+        sendEmail(
+            'High CPU Usage Alert',
+            `CPU usage is high: ${currentCpuUsage.toFixed(2)}%`
+        );
+        cpuAlert = true;
+    }
+    if (!memoryAlert && !cpuAlert) {
+        console.log('Memory and CPU usage are within limits, sending normal state email...');
+        sendEmail(
+            'System Normal State',
+            `CPU and memory are operating normally:\nCPU Usage: ${currentCpuUsage.toFixed(2)}%\nMemory Usage: ${memoryUsage.heapUsed} bytes (${((memoryUsage.heapUsed / totalMemory) * 100).toFixed(2)}% of total memory)`
+        );
+    }
+
+    const responseMessage = `Current Memory Usage: ${memoryUsage.heapUsed} bytes\n` +
+                            `Current CPU Usage: ${currentCpuUsage.toFixed(2)}%\n` +
+                            (memoryAlert ? "Memory usage exceeded threshold!" : "Memory usage is within limits.") + "\n" +
+                            (cpuAlert ? "CPU usage exceeded threshold!" : "CPU usage is within limits.");
+
+    res.send(responseMessage);
+});
+
+monitorApp.listen(MONITOR_PORT, () => {
+    console.log(`Memory monitoring server running at http://localhost:${MONITOR_PORT}`);
+});
+
+setInterval(() => {
+    checkMemoryUsage();
+}, 10000);
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
