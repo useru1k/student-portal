@@ -23,30 +23,31 @@ const Editor = () => {
 
   return (
     <>
-      <Navbar
-        streakCount={1} // Example streak count
-        
+  {/* Fixed Navbar */}
+  <Navbar streakCount={1} className="fixed top-0 left-0 w-full z-10" />
+
+  {/* Main Content */}
+  <div className="flex-1 w-full flex flex-row min-h-screen pt-[4rem]"> {/* Adjust pt based on Navbar height */}
+    <div className="flex-grow p-1">
+      <Question
+        currentIndex={currentIndex}
+        setCurrentIndex={setCurrentIndex}
       />
-       <div className="flex-1 w-full flex  flex-row min-h-screen">
-        <div className="flex-grow p-1">
-          <Question
-            currentIndex={currentIndex}
-            setCurrentIndex={setCurrentIndex}
-          />
-        </div>
-        <div className="flex-1 w-full flex flex-col p-1">
-          <div className="flex-grow pt-1">
-            <Answer
-              currentIndex={currentIndex}
-              code={codes[currentIndex]} 
-              onCodeChange={handleCodeChange} 
-              language={language}
-              onLanguageChange={handleLanguageChange}
-            />
-          </div>
-        </div>
+    </div>
+    <div className="flex-1 w-full flex flex-col p-1">
+      <div className="flex-grow pt-1">
+        <Answer
+          currentIndex={currentIndex}
+          code={codes[currentIndex]} 
+          onCodeChange={handleCodeChange} 
+          language={language}
+          onLanguageChange={handleLanguageChange}
+        />
       </div>
-    </>
+    </div>
+  </div>
+</>
+
   );
 };
 
