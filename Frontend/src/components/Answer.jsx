@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import { FaPlay, FaSun, FaMoon } from "react-icons/fa";
+import {FaPlay, FaSun, FaMoon, FaCode } from "react-icons/fa";
 import "../assets/css/Answer.css";
 
-const Answer = ({ currentIndex, language, code, onCodeChange }) => {
+const Answer = ({ currentIndex, code, onCodeChange,language, onLanguageChange }) => {
   const [theme, setTheme] = useState("vs-dark");
   const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
@@ -13,6 +13,10 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
   const [useCustomInput, setUseCustomInput] = useState(false);
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState(code || "");
+  const [showPrefilledCode, setShowPrefilledCode] = useState(false);
+
+  const prefilledCode = `// Your prefilled code example here
+console.log('Hello, World!');`;
 
   useEffect(() => {
     setEditorContent(code || "");
@@ -118,14 +122,14 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
 
   return (
     <div
-      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[500px]"
+      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[90%]"
       onContextMenu={(e) => {
         e.preventDefault();
         alert("Right-click disabled");
       }}
     >
       {/* Top bar with Theme and Run button */}
-      <div className="top-bar mb-2 flex justify-between items-center">
+      <div className="top-bar mb-1 flex justify-between items-center">
         <button
           className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center mr-2"
           onClick={() =>
@@ -134,7 +138,13 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
         >
           {theme === "vs-dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
         </button>
-
+        <button
+          className="btn-prefill bg-blue-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
+          onClick={() => setShowPrefilledCode((prev) => !prev)}
+        >
+          <FaCode />
+          <span>{showPrefilledCode ? 'Hide Prefilled Code' : 'Show Prefilled Code'}</span>
+        </button>
         <button
           className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
           onClick={compileCode}
@@ -142,7 +152,28 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
           <FaPlay />
           <span>Run</span>
         </button>
+        <select
+          value={language}
+          onChange={(e) => onLanguageChange(e.target.value)}
+          className="ml-4 bg-white border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring focus:ring-purple-200 text-black"
+        >
+          <option value="python">Python</option>
+          <option value="cpp">C++</option>
+          <option value="c">C</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+        </select>
       </div>
+          {/* Prefilled Code Section */}
+      {showPrefilledCode && (
+        <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
+          <h2 className="text-lg font-bold mb-2">Prefilled Code</h2>
+          <pre className="whitespace-pre-wrap border border-gray-300 p-2 bg-gray-800 text-white">
+            {prefilledCode}
+          </pre>
+        </div>
+      )}
+
 
       {/* Monaco Editor */}
       <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden">
@@ -166,7 +197,7 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
       {/* Output Section */}
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
-          <div className="controls mb-4 flex items-center space-x-2">
+          <div className="controls  flex items-center space-x-2">{/*remove mb-4 */}
             <label className="flex items-center text-white">
               <input
                 type="checkbox"
@@ -205,7 +236,7 @@ const Answer = ({ currentIndex, language, code, onCodeChange }) => {
                 <td className="p-2 border border-gray-600">
                   <textarea
                     value={expectedOutput}
-                    onChange={(e) => setExpectedOutput(e.target.value)}
+                   // onChange={(e) => setExpectedOutput(e.target.value)}
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
                   />
                 </td>

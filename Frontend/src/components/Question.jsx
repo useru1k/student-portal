@@ -3,6 +3,8 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Answer from './Answer';
 import Question1 from './Question1';
 import Question2 from './Question2';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Question = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,21 +44,19 @@ const Question = () => {
   };
 
   return (
-    <div className="relative drop-shadow-lg p-4 md:w-[450px] md:h-[505px] overflow-hidden rounded-xl bg-gradient-to-r from-[#2b2e33] to-[#1c1e22] flex items-center justify-center font-inter" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <div className="absolute w-56 h-56 bg-gradient-to-br from-white via-blue-300 to-transparent blur-[60px]"></div>
+   <div className="relative  drop-shadow-lg p-4 md:w-[450px] md:h-[90%] overflow-hidden rounded-xl bg-gradient-to-r from-[#2b2e33] to-[#1c1e22] flex flex-col items-center justify-between font-inter" style={{ fontFamily: 'Inter, sans-serif' }}>
+      
+
       <div className="absolute flex flex-col items-center justify-between text-white z-[1] rounded-xl inset-0.5 bg-[#282c34] bg-opacity-80 backdrop-blur-md w-full h-full overflow-y-auto pt-3 px-4 sm:px-6 pb-12">
-        
+
         <div className="w-full">
           <div className="flex justify-between mb-4 items-center">
-            
             <div
-              className={`text-white text-xs md:text-sm text-center py-1 px-3 rounded-full ${
-                timers[currentIndex] < 10 ? 'bg-red-600' : 'bg-blue-600 bg-opacity-80 shadow-sm'
-              }`}
+              className={`text-white text-xs md:text-sm text-center py-1 px-3 rounded-full ${timers[currentIndex] < 10 ? 'bg-red-600' : 'bg-blue-600 bg-opacity-80 shadow-sm'
+                }`}
             >
               Time Left: {formatTime(timers[currentIndex])}
             </div>
-            
             <div className="text-white text-xs md:text-sm text-center py-1 px-3 rounded-full bg-blue-600 bg-opacity-80 shadow-sm">
               Score: 0.0 / 10
             </div>
@@ -67,7 +67,6 @@ const Question = () => {
           </div>
         </div>
       </div>
-
       <div className="absolute bottom-2 flex items-center justify-center w-full z-10 space-x-2 md:space-x-4">
         <button
           type="button"
