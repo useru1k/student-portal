@@ -4,7 +4,9 @@ import { FaFire } from "react-icons/fa";
 const Navbar = ({ language, onLanguageChange, streakCount }) => {
   return (
     <nav
-      className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 flex justify-between items-center shadow-lg w-full h-[20%]"
+    className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 flex justify-between items-center shadow-lg w-full"
+    style={{ height: "60px" }}
+    
       
     >
       <div className="flex space-x-6">

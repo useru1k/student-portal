@@ -122,7 +122,7 @@ console.log('Hello, World!');`;
 
   return (
     <div
-      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[90%]"
+      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[98%]"
       onContextMenu={(e) => {
         e.preventDefault();
         alert("Right-click disabled");
