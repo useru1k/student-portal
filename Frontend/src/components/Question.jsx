@@ -43,7 +43,7 @@ const Question = () => {
   };
 
   return (
-    <div className="relative drop-shadow-lg p-4 md:w-[450px] md:h-[98%] overflow-hidden rounded-xl bg-gradient-to-r from-[#2b2e33] to-[#1c1e22] flex flex-col items-center justify-between font-inter" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="relative p-4 md:w-[450px] md:h-[98%] overflow-hidden rounded-xl bg-gradient-to-r from-[#2b2e33] to-[#1c1e22] flex flex-col items-center justify-between font-inter" style={{ fontFamily: 'Inter, sans-serif' }}>
 
     <div className="absolute flex flex-col items-center justify-between text-white z-[1] rounded-xl inset-0.5 bg-[#282c34] bg-opacity-80 backdrop-blur-md w-full h-full overflow-y-auto pt-3 px-4 sm:px-6 pb-12">
       
