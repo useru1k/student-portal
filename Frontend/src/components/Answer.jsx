@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import {FaPlay, FaSun, FaMoon, FaCode } from "react-icons/fa";
+import { FaPlay, FaSun, FaMoon, FaCode } from "react-icons/fa";
 import "../assets/css/Answer.css";
 
-const Answer = ({ currentIndex, code, onCodeChange,language, onLanguageChange }) => {
+const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, questions }) => {
   const [theme, setTheme] = useState("vs-dark");
   const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
@@ -12,62 +12,28 @@ const Answer = ({ currentIndex, code, onCodeChange,language, onLanguageChange })
   const [compilationMessage, setCompilationMessage] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false);
   const editorRef = useRef(null);
-  const [editorContent, setEditorContent] = useState(code || "");
+  const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
 
   const prefilledCode = `// Your prefilled code example here
 console.log('Hello, World!');`;
 
   useEffect(() => {
-    setEditorContent(code || "");
+    // Load code from local storage
+    const storedCode = localStorage.getItem(`code_${currentIndex}`);
+    setEditorContent(storedCode || code || "");
   }, [currentIndex, code]);
 
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
+    // Store code in local storage
+    localStorage.setItem(`code_${currentIndex}`, newCode);
   };
-
-  useEffect(() => {
-    const handleClipboardEvent = (e) => {
-      e.preventDefault();
-      alert(`Clipboard action (${e.type}) is disabled`);
-    };
-
-    document.addEventListener("copy", handleClipboardEvent);
-    document.addEventListener("cut", handleClipboardEvent);
-    document.addEventListener("paste", handleClipboardEvent);
-
-    return () => {
-      document.removeEventListener("copy", handleClipboardEvent);
-      document.removeEventListener("cut", handleClipboardEvent);
-      document.removeEventListener("paste", handleClipboardEvent);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        (e.key === 'c' || e.key === 'x' || e.key === 'v')
-      ) {
-        e.preventDefault();
-        alert("Clipboard actions (copy, cut, paste) are disabled");
-      }
-      if (e.key === 'Insert' || (e.key === 'Delete' && e.shiftKey)) {
-        e.preventDefault();
-        alert("Alternative clipboard actions are disabled");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    // Other command bindings for disabling clipboard actions...
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {
       alert("Copy is disabled");
     });
@@ -105,7 +71,7 @@ console.log('Hello, World!');`;
       const response = await fetch("http://localhost:3000/compile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, language, customInput }),
+        body: JSON.stringify({ code: editorContent, language, customInput }),
       });
 
       if (!response.ok) {
@@ -115,19 +81,13 @@ console.log('Hello, World!');`;
       const result = await response.text();
       setGotOutput(result);
     } catch (error) {
-      setGotOutput(`Error:${error}`);
+      setGotOutput(`Error: ${error}`);
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };
 
   return (
-    <div
-      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[98%]"
-      onContextMenu={(e) => {
-        e.preventDefault();
-        alert("Right-click disabled");
-      }}
-    >
+    <div className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[98%]">
       {/* Top bar with Theme and Run button */}
       <div className="top-bar mb-1 flex justify-between items-center">
         <button
@@ -164,7 +124,8 @@ console.log('Hello, World!');`;
           <option value="java">Java</option>
         </select>
       </div>
-          {/* Prefilled Code Section */}
+
+      {/* Prefilled Code Section */}
       {showPrefilledCode && (
         <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
           <h2 className="text-lg font-bold mb-2">Prefilled Code</h2>
@@ -173,7 +134,6 @@ console.log('Hello, World!');`;
           </pre>
         </div>
       )}
-
 
       {/* Monaco Editor */}
       <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden">
@@ -197,7 +157,7 @@ console.log('Hello, World!');`;
       {/* Output Section */}
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
-          <div className="controls  flex items-center space-x-2">{/*remove mb-4 */}
+          <div className="controls flex items-center space-x-2">
             <label className="flex items-center text-white">
               <input
                 type="checkbox"
@@ -221,7 +181,6 @@ console.log('Hello, World!');`;
             </thead>
             <tbody>
               <tr>
-                {/* Custom Input */}
                 {useCustomInput && (
                   <td className="p-2 border border-gray-600">
                     <input
@@ -232,26 +191,29 @@ console.log('Hello, World!');`;
                     />
                   </td>
                 )}
-                {/* Expected Output */}
                 <td className="p-2 border border-gray-600">
                   <textarea
                     value={expectedOutput}
-                   // onChange={(e) => setExpectedOutput(e.target.value)}
-                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                    onChange={(e) => setExpectedOutput(e.target.value)}
+                    rows="1"
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
                   />
                 </td>
-
-                {/* Got Output */}
                 <td className="p-2 border border-gray-600">
                   <textarea
                     value={gotOutput}
                     readOnly
-                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                    rows="1"
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
                   />
                 </td>
               </tr>
             </tbody>
           </table>
+
+          {compilationMessage && (
+            <p className="text-red-500">{compilationMessage}</p>
+          )}
         </div>
       )}
     </div>
