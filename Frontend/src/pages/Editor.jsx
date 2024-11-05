@@ -8,23 +8,6 @@ const Editor = () => {
   const [codes, setCodes] = useState(["", ""]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    // Retrieve code from localStorage for the current question
-    const savedCode = localStorage.getItem(`code-${currentIndex}`);
-    if (savedCode !== null) {
-      setCodes((prevCodes) => {
-        const updatedCodes = [...prevCodes];
-        updatedCodes[currentIndex] = savedCode;
-        return updatedCodes;
-      });
-    }
-  }, [currentIndex]);
-
-  useEffect(() => {
-    // Save the current code to localStorage whenever it changes
-    localStorage.setItem(`code-${currentIndex}`, codes[currentIndex]);
-  }, [codes, currentIndex]);
-
   const handleLanguageChange = (selectedLanguage) => {
     setLanguage(selectedLanguage);
     console.log("Selected language:", selectedLanguage);
