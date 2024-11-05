@@ -19,7 +19,6 @@ const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, 
 console.log('Hello, World!');`;
 
   useEffect(() => {
-    // Load code from local storage
     const storedCode = localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
   }, [currentIndex, code]);
@@ -27,13 +26,12 @@ console.log('Hello, World!');`;
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
-    // Store code in local storage
     localStorage.setItem(`code_${currentIndex}`, newCode);
   };
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    // Other command bindings for disabling clipboard actions...
+
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {
       alert("Copy is disabled");
     });
@@ -43,7 +41,6 @@ console.log('Hello, World!');`;
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V, () => {
       alert("Paste is disabled");
     });
-
     editor.onContextMenu((e) => {
       e.preventDefault();
       alert("Right-click context menu is disabled");
@@ -81,14 +78,52 @@ console.log('Hello, World!');`;
       const result = await response.text();
       setGotOutput(result);
     } catch (error) {
-      setGotOutput(`Error: ${error}`);
+      setGotOutput(`Error: ${error.message}`);
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };
 
+  useEffect(() => {
+    const handleClipboardEvent = (e) => {
+      e.preventDefault();
+      alert(`Clipboard action (${e.type}) is disabled`);
+    };
+
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === 'c' || e.key === 'x' || e.key === 'v')
+      ) {
+        e.preventDefault();
+        alert("Clipboard actions (copy, cut, paste) are disabled");
+      }
+      if (e.key === 'Insert' || (e.key === 'Delete' && e.shiftKey)) {
+        e.preventDefault();
+        alert("Alternative clipboard actions are disabled");
+      }
+    };
+
+    document.addEventListener("copy", handleClipboardEvent);
+    document.addEventListener("cut", handleClipboardEvent);
+    document.addEventListener("paste", handleClipboardEvent);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("copy", handleClipboardEvent);
+      document.removeEventListener("cut", handleClipboardEvent);
+      document.removeEventListener("paste", handleClipboardEvent);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
-    <div className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[98%]">
-      {/* Top bar with Theme and Run button */}
+    <div
+      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[98%]"
+      onContextMenu={(e) => {
+        e.preventDefault();
+        alert("Right-click disabled");
+      }}
+    >
       <div className="top-bar mb-1 flex justify-between items-center">
         <button
           className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center mr-2"
@@ -125,7 +160,6 @@ console.log('Hello, World!');`;
         </select>
       </div>
 
-      {/* Prefilled Code Section */}
       {showPrefilledCode && (
         <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
           <h2 className="text-lg font-bold mb-2">Prefilled Code</h2>
@@ -135,7 +169,6 @@ console.log('Hello, World!');`;
         </div>
       )}
 
-      {/* Monaco Editor */}
       <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden">
         <MonacoEditor
           height="100%"
@@ -154,7 +187,6 @@ console.log('Hello, World!');`;
         />
       </div>
 
-      {/* Output Section */}
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
           <div className="controls flex items-center space-x-2">
@@ -191,29 +223,11 @@ console.log('Hello, World!');`;
                     />
                   </td>
                 )}
-                <td className="p-2 border border-gray-600">
-                  <textarea
-                    value={expectedOutput}
-                    onChange={(e) => setExpectedOutput(e.target.value)}
-                    rows="1"
-                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
-                  />
-                </td>
-                <td className="p-2 border border-gray-600">
-                  <textarea
-                    value={gotOutput}
-                    readOnly
-                    rows="1"
-                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
-                  />
-                </td>
+                <td className="p-2 border border-gray-600 text-white">{expectedOutput}</td>
+                <td className="p-2 border border-gray-600 text-white">{gotOutput}</td>
               </tr>
             </tbody>
           </table>
-
-          {compilationMessage && (
-            <p className="text-red-500">{compilationMessage}</p>
-          )}
         </div>
       )}
     </div>
