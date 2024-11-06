@@ -7,6 +7,7 @@ const Editor = () => {
   const [language, setLanguage] = useState("python"); 
   const [codes, setCodes] = useState(["", ""]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const questionLanguage='any';//db value foe language
 
   const handleLanguageChange = (selectedLanguage) => {
     setLanguage(selectedLanguage);
@@ -56,6 +57,7 @@ const Editor = () => {
               onCodeChange={handleCodeChange}
               language={language}
               onLanguageChange={handleLanguageChange}
+              questionLanguage={questionLanguage}
             />
           </div>
         </div>
