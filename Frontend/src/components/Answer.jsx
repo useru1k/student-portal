@@ -3,7 +3,7 @@ import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { FaPlay, FaSun, FaMoon, FaCode } from "react-icons/fa";
 import "../assets/css/Answer.css";
 
-const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, questions }) => {
+const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, questions,questionLanguage }) => {
   const [theme, setTheme] = useState("vs-dark");
   const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
@@ -14,7 +14,14 @@ const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, 
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-
+  const languagesArray = [
+    { value: "python", label: "Python" },
+    { value: "cpp", label: "C++" },
+    { value: "c", label: "C" },
+    { value: "javascript", label: "JavaScript" },
+    { value: "java", label: "Java" },
+  ];//for show of all language
+  const filteredLanguages = questionLanguage === "any"  ? languagesArray : languagesArray.filter(lang => lang.value === questionLanguage);//filter the language
   const prefilledCode = `// Your prefilled code example here
 console.log('Hello, World!');`;
 
@@ -147,16 +154,17 @@ console.log('Hello, World!');`;
           <FaPlay />
           <span>Run</span>
         </button>
+        {/*dropdown for language */}
         <select
           value={language}
           onChange={(e) => onLanguageChange(e.target.value)}
           className="ml-4 bg-white border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring focus:ring-purple-200 text-black"
         >
-          <option value="python">Python</option>
-          <option value="cpp">C++</option>
-          <option value="c">C</option>
-          <option value="javascript">JavaScript</option>
-          <option value="java">Java</option>
+          {filteredLanguages.map((lang) => (
+            <option key={lang.value} value={lang.value}>
+              {lang.label}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -189,7 +197,7 @@ console.log('Hello, World!');`;
 
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
-          <div className="controls flex items-center space-x-2">
+          <div className="controls  flex items-center space-x-2">{/*remove mb-4 */}
             <label className="flex items-center text-white">
               <input
                 type="checkbox"
@@ -213,6 +221,7 @@ console.log('Hello, World!');`;
             </thead>
             <tbody>
               <tr>
+                {/* Custom Input */}
                 {useCustomInput && (
                   <td className="p-2 border border-gray-600">
                     <input
@@ -223,8 +232,23 @@ console.log('Hello, World!');`;
                     />
                   </td>
                 )}
-                <td className="p-2 border border-gray-600 text-white">{expectedOutput}</td>
-                <td className="p-2 border border-gray-600 text-white">{gotOutput}</td>
+                {/* Expected Output */}
+                <td className="p-2 border border-gray-600">
+                  <textarea
+                    value={expectedOutput}
+                   // onChange={(e) => setExpectedOutput(e.target.value)}
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                  />
+                </td>
+
+                {/* Got Output */}
+                <td className="p-2 border border-gray-600">
+                  <textarea
+                    value={gotOutput}
+                    readOnly
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                  />
+                </td>
               </tr>
             </tbody>
           </table>
