@@ -5,33 +5,7 @@ import Navbar from "../components/Navbar";
 
 const Editor = () => {
   const [language, setLanguage] = useState("python");
-  const [codes, setCodes] = useState(["", ""]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleLanguageChange = (selectedLanguage) => {
-    setLanguage(selectedLanguage);
-  };
-
-  const handleCodeChange = (newCode) => {
-    setCodes((prevCodes) => {
-      const updatedCodes = [...prevCodes];
-      updatedCodes[currentIndex] = newCode;
-      return updatedCodes;
-    });
-  };
-
-  const goToNextQuestion = () => {
-    if (currentIndex < codes.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  const goToPreviousQuestion = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
+  const [code, setCode] = useState("// Write your code here...");
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
 
@@ -63,33 +37,35 @@ const Editor = () => {
     return <p>You have been logged out due to tab switching.</p>;
   }
 
+  const handleLanguageChange = (selectedLanguage) => {
+    setLanguage(selectedLanguage);
+    console.log("Selected language:", selectedLanguage);
+  };
+
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+  };
+
   return (
     <>
-      {/* Fixed Navbar */}
-      <Navbar streakCount={1} className="fixed top-0 left-0 w-full z-10" />
-
-      {/* Main Content */}
-      <div className="flex flex-col md:flex-row min-h-screen p-4 space-y-4 md:space-y-0 md:space-x-4 pt-[4rem] overflow-y-auto overflow-x-auto">
-
-        {/* Question component */}
-        <div className="w-full rounded-sm md:w-[40%] lg:w-[45%] xl:w-[35%] 2xl:w-[30%]">
-          <Question
-            currentIndex={currentIndex}
-            setCurrentIndex={setCurrentIndex}
-            onNext={goToNextQuestion}
-            onPrevious={goToPreviousQuestion}
-          />
+      <Navbar
+        language={language}
+        streakCount={1} // Example streak count
+        onLanguageChange={handleLanguageChange}
+      />
+      <div className="flex w-full h-screen p-0 mt-16">
+        <div className="h-full p-1">
+          <Question />
         </div>
-
-        {/* Answer component */}
-        <div className="w-full rounded-sm md:w-[60%] lg:w-[55%] xl:w-[64%] 2xl:w-[70%]">
-          <Answer
-            currentIndex={currentIndex}
-            code={codes[currentIndex]}
-            onCodeChange={handleCodeChange}
-            language={language}
-            onLanguageChange={handleLanguageChange}
-          />
+        <div className="w-[70%] flex flex-col p-1">
+          <div className="h-[40%] pt-1">
+            <Answer
+              currentIndex={0}
+              language={language}
+              code={code}
+              onCodeChange={handleCodeChange}
+            />
+          </div>
         </div>
       </div>
     </>
