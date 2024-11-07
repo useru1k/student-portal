@@ -33,7 +33,7 @@ const A_TopNav = ({ isSideNavOpen, toggleSideNav, adminID }) => {
         <MdArrowDropDown onClick={toggleDropdown} className="cursor-pointer" size={24} />
         
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-[110%] w-[70%] bg-white text-gray-800 rounded-md shadow-lg">
+          <div className="absolute right-0 mt-[170%] bg-white text-gray-800 rounded-md shadow-lg">
             <a href="/profile" className="block px-4 py-2 hover:bg-gray-200">Profile</a>
             <a href="/settings" className="block px-4 py-2 hover:bg-gray-200">Settings</a>
             <div className="border-t border-gray-200"></div>

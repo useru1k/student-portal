@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { HomeIcon, BookOpenIcon, UserIcon } from 'lucide-react'; // Import icons
+import { HomeIcon, BookOpenIcon } from 'lucide-react'; // Import icons
 import { MdLeaderboard, MdQueuePlayNext } from 'react-icons/md';
 
 const A_SideNav = ({ isOpen }) => {
@@ -10,7 +10,7 @@ const A_SideNav = ({ isOpen }) => {
           <Link to="/adashboard/acourses" className="flex hover:bg-gray-700 items-center">
             <li className="p-4 flex items-center transition-colors duration-200">
               <BookOpenIcon className="mr-2" size={23} />
-              <span>Courses</span>
+              <span>Course Management</span>
             </li>
           </Link>
           <Link to="/adashboard/aupcomingevents" className="flex hover:bg-gray-700 items-center">
@@ -23,18 +23,6 @@ const A_SideNav = ({ isOpen }) => {
             <li className="p-4 flex items-center transition-colors duration-200">
               <MdLeaderboard className="mr-2" size={23} />
               <span>Leader Board</span>
-            </li>
-          </Link>
-          <Link to="/adashboard/aprofile" className="flex hover:bg-gray-700 items-center">
-            <li className="p-4 flex items-center transition-colors duration-200">
-              <UserIcon className="mr-2" size={23} />
-              <span>Profile</span>
-            </li>
-          </Link>
-          <Link to="/adashboard/atestattempt" className="flex hover:bg-gray-700 items-center">
-            <li className="p-4 flex items-center transition-colors duration-200">
-              <UserIcon className="mr-2" size={23} />
-              <span>Test Attempt</span>
             </li>
           </Link>
           <Link to="/adashboard/ahome" className="flex hover:bg-gray-700 items-center">

@@ -22,7 +22,10 @@ const TopNav = ({ isSideNavOpen, toggleSideNav, studentID }) => {
         <button onClick={toggleSideNav} className="text-white p-2">
           {isSideNavOpen ? <XIcon size={24} /> : <AlignLeft size={24} />}
         </button>
-        <h1 className="text-xl font-semibold ml-4">Welcome, BHARATHI</h1>
+        <h1 className="text-xl font-semibold ml-4">
+  Welcome, <a href="/dashboard/profile">BHARATHI</a>
+</h1>
+
       </div>
 
       {/* Student ID and User Icon with Dropdown */}
@@ -32,9 +35,9 @@ const TopNav = ({ isSideNavOpen, toggleSideNav, studentID }) => {
         <MdArrowDropDown onClick={toggleDropdown} className="cursor-pointer" size={24} />
         
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-[170%] w-[100%] bg-white text-gray-800 rounded-md shadow-lg">
-            <a href="/profile" className="block px-4 py-2 hover:bg-gray-200">Profile</a>
-            <a href="/settings" className="block px-4 py-2 hover:bg-gray-200">Settings</a>
+          <div className="absolute right-0 mt-[120%] w-[100%] bg-white text-gray-800 rounded-md shadow-lg">
+            <a href="/dashboard/profile" className="block px-4 py-2 hover:bg-gray-200">Profile</a>
+            {/* <a href="/dashboard/settings" className="block px-4 py-2 hover:bg-gray-200">Settings</a> */}
             <div className="border-t border-gray-200"></div>
             <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-200">
               Logout

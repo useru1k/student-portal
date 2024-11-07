@@ -25,12 +25,12 @@ const SideNav = ({ isOpen }) => {
             <span>Leader Board</span>
           </li>
         </Link>
-        <Link to="/dashboard/profile" className="flex hover:bg-gray-700 items-center">
+        {/* <Link to="/dashboard/profile" className="flex hover:bg-gray-700 items-center">
           <li className="p-4 flex items-center transition-colors duration-200">
             <UserIcon className="mr-2" size={23} />
             <span>Profile</span>
           </li>
-        </Link>
+        </Link> */}
         <Link to="/dashboard/siethome" className="flex hover:bg-gray-700 items-center">
           <li className="p-4 flex items-center transition-colors duration-200">
             <HomeIcon className="mr-2" size={23} />
