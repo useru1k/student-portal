@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import { FaPlay, FaSun, FaMoon, FaCode } from "react-icons/fa";
+import { FaPlay, FaSun, FaMoon } from "react-icons/fa";
 import "../assets/css/Answer.css";
 
-const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, questions }) => {
+const Answer = ({ currentIndex, language, code, onCodeChange }) => {
   const [theme, setTheme] = useState("vs-dark");
   const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
@@ -12,26 +12,58 @@ const Answer = ({ currentIndex, code, onCodeChange, language, onLanguageChange, 
   const [compilationMessage, setCompilationMessage] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false);
   const editorRef = useRef(null);
-  const [editorContent, setEditorContent] = useState("");
-  const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-
-  const prefilledCode = `// Your prefilled code example here
-console.log('Hello, World!');`;
+  const [editorContent, setEditorContent] = useState(code || "");
 
   useEffect(() => {
-    const storedCode = localStorage.getItem(`code_${currentIndex}`);
-    setEditorContent(storedCode || code || "");
+    setEditorContent(code || "");
   }, [currentIndex, code]);
 
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
-    localStorage.setItem(`code_${currentIndex}`, newCode);
   };
+
+  useEffect(() => {
+    const handleClipboardEvent = (e) => {
+      e.preventDefault();
+      alert(`Clipboard action (${e.type}) is disabled`);
+    };
+
+    document.addEventListener("copy", handleClipboardEvent);
+    document.addEventListener("cut", handleClipboardEvent);
+    document.addEventListener("paste", handleClipboardEvent);
+
+    return () => {
+      document.removeEventListener("copy", handleClipboardEvent);
+      document.removeEventListener("cut", handleClipboardEvent);
+      document.removeEventListener("paste", handleClipboardEvent);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === 'c' || e.key === 'x' || e.key === 'v')
+      ) {
+        e.preventDefault();
+        alert("Clipboard actions (copy, cut, paste) are disabled");
+      }
+      if (e.key === 'Insert' || (e.key === 'Delete' && e.shiftKey)) {
+        e.preventDefault();
+        alert("Alternative clipboard actions are disabled");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {
       alert("Copy is disabled");
     });
@@ -41,6 +73,7 @@ console.log('Hello, World!');`;
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V, () => {
       alert("Paste is disabled");
     });
+
     editor.onContextMenu((e) => {
       e.preventDefault();
       alert("Right-click context menu is disabled");
@@ -68,7 +101,7 @@ console.log('Hello, World!');`;
       const response = await fetch("http://localhost:3000/compile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: editorContent, language, customInput }),
+        body: JSON.stringify({ code, language, customInput }),
       });
 
       if (!response.ok) {
@@ -78,98 +111,41 @@ console.log('Hello, World!');`;
       const result = await response.text();
       setGotOutput(result);
     } catch (error) {
-      setGotOutput(`Error: ${error.message}`);
+      setGotOutput(`Error:${error}`);
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };
 
-  useEffect(() => {
-    const handleClipboardEvent = (e) => {
-      e.preventDefault();
-      alert(`Clipboard action (${e.type}) is disabled`);
-    };
-
-    const handleKeyDown = (e) => {
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        (e.key === 'c' || e.key === 'x' || e.key === 'v')
-      ) {
-        e.preventDefault();
-        alert("Clipboard actions (copy, cut, paste) are disabled");
-      }
-      if (e.key === 'Insert' || (e.key === 'Delete' && e.shiftKey)) {
-        e.preventDefault();
-        alert("Alternative clipboard actions are disabled");
-      }
-    };
-
-    document.addEventListener("copy", handleClipboardEvent);
-    document.addEventListener("cut", handleClipboardEvent);
-    document.addEventListener("paste", handleClipboardEvent);
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("copy", handleClipboardEvent);
-      document.removeEventListener("cut", handleClipboardEvent);
-      document.removeEventListener("paste", handleClipboardEvent);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   return (
     <div
-       className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 h-full lg:h-[98%]"
+      className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[500px]"
       onContextMenu={(e) => {
         e.preventDefault();
         alert("Right-click disabled");
       }}
     >
-      <div className="top-bar mb-1 flex flex-wrap justify-between items-center">
+      {/* Top bar with Theme and Run button */}
+      <div className="top-bar mb-2 flex justify-between items-center">
         <button
-          className="toggle-theme bg-gray-700 text-white py-1 px-2 sm:px-3 rounded-md flex items-center justify-center mr-2"
+          className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center mr-2"
           onClick={() =>
             setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"))
           }
         >
           {theme === "vs-dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
         </button>
+
         <button
-          className="btn-prefill bg-blue-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-xs sm:text-sm"
-          onClick={() => setShowPrefilledCode((prev) => !prev)}
-        >
-          <FaCode />
-          <span>{showPrefilledCode ? 'Hide Prefilled Code' : 'Show Prefilled Code'}</span>
-        </button>
-        <button
-          className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-xs sm:text-sm"
+          className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
           onClick={compileCode}
         >
           <FaPlay />
           <span>Run</span>
         </button>
-        <select
-          value={language}
-          onChange={(e) => onLanguageChange(e.target.value)}
-          className="ml-4 bg-white border border-gray-300 rounded-md py-1 px-2 sm:py-2 sm:px-4 focus:outline-none focus:ring focus:ring-purple-200 text-black text-xs sm:text-sm"
-        >
-          <option value="python">Python</option>
-          <option value="cpp">C++</option>
-          <option value="c">C</option>
-          <option value="javascript">JavaScript</option>
-          <option value="java">Java</option>
-        </select>
       </div>
 
-      {showPrefilledCode && (
-        <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white text-xs sm:text-sm">
-          <h2 className="text-sm font-bold mb-2">Prefilled Code</h2>
-          <pre className="whitespace-pre-wrap border border-gray-300 p-2 bg-gray-800 text-white">
-            {prefilledCode}
-          </pre>
-        </div>
-      )}
-
-      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[45vh] lg:h-[50%] overflow-hidden">
+      {/* Monaco Editor */}
+      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden">
         <MonacoEditor
           height="100%"
           width="100%"
@@ -187,10 +163,11 @@ console.log('Hello, World!');`;
         />
       </div>
 
+      {/* Output Section */}
       {showOutput && (
-        <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[30vh] lg:h-[40%] overflow-y-auto">
-          <div className="controls flex items-center space-x-2 mb-2">
-            <label className="flex items-center text-white text-xs sm:text-sm">
+        <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
+          <div className="controls mb-4 flex items-center space-x-2">
+            <label className="flex items-center text-white">
               <input
                 type="checkbox"
                 checked={useCustomInput}
@@ -201,7 +178,7 @@ console.log('Hello, World!');`;
             </label>
           </div>
 
-          <table className="w-full table-fixed text-xs sm:text-sm">
+          <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
                 {useCustomInput && (
@@ -213,18 +190,34 @@ console.log('Hello, World!');`;
             </thead>
             <tbody>
               <tr>
+                {/* Custom Input */}
                 {useCustomInput && (
                   <td className="p-2 border border-gray-600">
                     <input
                       type="text"
                       value={customInput}
                       onChange={(e) => setCustomInput(e.target.value)}
-                      className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md text-xs"
+                      className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
                     />
                   </td>
                 )}
-                <td className="p-2 border border-gray-600 text-white">{expectedOutput}</td>
-                <td className="p-2 border border-gray-600 text-white">{gotOutput}</td>
+                {/* Expected Output */}
+                <td className="p-2 border border-gray-600">
+                  <textarea
+                    value={expectedOutput}
+                    onChange={(e) => setExpectedOutput(e.target.value)}
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                  />
+                </td>
+
+                {/* Got Output */}
+                <td className="p-2 border border-gray-600">
+                  <textarea
+                    value={gotOutput}
+                    readOnly
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                  />
+                </td>
               </tr>
             </tbody>
           </table>
