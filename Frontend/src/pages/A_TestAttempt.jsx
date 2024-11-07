@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PlusCircleIcon } from 'lucide-react';
 
 const A_TestAttempt = () => {
   const [testName, setTestName] = useState('');
@@ -8,16 +9,20 @@ const A_TestAttempt = () => {
   const [allowedAttempts, setAllowedAttempts] = useState(1);
   const [totalTime, setTotalTime] = useState(0);
   const [isTimeLimitEnabled, setIsTimeLimitEnabled] = useState(true);
-  const [timePerLimitHours, setTimePerLimitHours] = useState(0);
-  const [timePerLimitMinutes, setTimePerLimitMinutes] = useState(0);
-  const [gradeScale, setGradeScale] = useState('percentage');
+  const [timePerLimitMinutes, setTimePerLimitMinutes] = useState(0); // Separate state for minutes
   const [submittedDetailsList, setSubmittedDetailsList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null); // Track which item is being edited
+  const[numQuestions,setNumQuestions]=useState('');
   const [isDateTimeEnabled, setIsDateTimeEnabled] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [editIndex, setEditIndex] = useState(-1); // State to track which index is being edited
+  const [isEntryEnabled, setIsEntryEnabled] = useState(false);
+  const [quitPassword, setQuitPassword] = useState('');
+  const [entryPassword, setEntryPassword] = useState('');
+  const [isReviewEnabled, setIsReviewEnabled] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,7 +36,6 @@ const A_TestAttempt = () => {
       totalTime,
       isTimeLimitEnabled,
       timePerLimit: {
-        hours: timePerLimitHours,
         minutes: timePerLimitMinutes,
       },
       isDateTimeEnabled,
@@ -39,26 +43,26 @@ const A_TestAttempt = () => {
       startTime,
       endDate,
       endTime,
-      gradeScale,
+      isEntryEnabled,
+      quitPassword,
+      isReviewEnabled,
+      numQuestions,
     };
 
-    if (editIndex >= 0) {
-      // Update existing detail
-      setSubmittedDetailsList((prevList) => {
-        const updatedList = [...prevList];
-        updatedList[editIndex] = newDetails; // Replace the edited detail
-        return updatedList;
-      });
+    if (editIndex !== null) {
+      const updatedDetailsList = [...submittedDetailsList];
+      updatedDetailsList[editIndex] = newDetails;
+      setSubmittedDetailsList(updatedDetailsList);
+      setEditIndex(null);
     } else {
-      // Add new submission
       setSubmittedDetailsList((prevList) => [...prevList, newDetails]);
     }
 
-    // Clear form fields after submission
-    resetForm();
+    clearForm();
+    setIsFormVisible(false);
   };
 
-  const resetForm = () => {
+  const clearForm = () => {
     setTestName('');
     setTotalMarks(0);
     setQuestionTimeLimit(0);
@@ -66,93 +70,279 @@ const A_TestAttempt = () => {
     setAllowedAttempts(1);
     setTotalTime(0);
     setIsTimeLimitEnabled(true);
-    setTimePerLimitHours(0);
     setTimePerLimitMinutes(0);
-    setGradeScale('percentage');
     setIsDateTimeEnabled(false);
     setStartDate('');
     setStartTime('');
     setEndDate('');
     setEndTime('');
-    setEditIndex(-1); // Reset edit index
+    setIsEntryEnabled(false);
+    setQuitPassword('');
+    setEntryPassword('');
+    setIsReviewEnabled(false);
+    setNumQuestions('');
   };
 
   const handleEdit = (index) => {
-    const detailsToEdit = submittedDetailsList[index];
-    setTestName(detailsToEdit.testName);
-    setTotalMarks(detailsToEdit.totalMarks);
-    setQuestionTimeLimit(detailsToEdit.questionTimeLimit);
-    setPassGrade(detailsToEdit.passGrade);
-    setAllowedAttempts(detailsToEdit.allowedAttempts);
-    setTotalTime(detailsToEdit.totalTime);
-    setIsTimeLimitEnabled(detailsToEdit.isTimeLimitEnabled);
-    setTimePerLimitMinutes(detailsToEdit.timePerLimit.minutes);
-    setIsDateTimeEnabled(detailsToEdit.isDateTimeEnabled);
-    setStartDate(detailsToEdit.startDate);
-    setStartTime(detailsToEdit.startTime);
-    setEndDate(detailsToEdit.endDate);
-    setEndTime(detailsToEdit.endTime);
-    setEditIndex(index); // Set the index being edited
+    const details = submittedDetailsList[index];
+    setTestName(details.testName);
+    setTotalMarks(details.totalMarks);
+    setQuestionTimeLimit(details.questionTimeLimit);
+    setPassGrade(details.passGrade);
+    setAllowedAttempts(details.allowedAttempts);
+    setTotalTime(details.totalTime);
+    setIsTimeLimitEnabled(details.isTimeLimitEnabled);
+    setTimePerLimitMinutes(details.timePerLimit.minutes);
+    setIsDateTimeEnabled(details.isDateTimeEnabled);
+    setStartDate(details.startDate);
+    setStartTime(details.startTime);
+    setEndDate(details.endDate);
+    setEndTime(details.endTime);
+    setIsEntryEnabled(details.isEntryEnabled);
+    setQuitPassword(details.quitPassword);
+    setIsReviewEnabled(details.isReviewEnabled);
+    setEditIndex(index);
+    setNumQuestions(details.numQuestions);
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-y-auto max-h-[80vh] custom-scroll">
-      <h1 className="text-3xl font-bold mb-6 text-center text-indigo-800">
-        Create/Edit Test Attempt
+    <>
+      <h1 className="text-3xl font-bold mb-6 text-left text-black">
+        TEST
       </h1>
+      <PlusCircleIcon 
+            className="h-8 w-8 text-indigo-600 cursor-pointer" 
+            onClick={() => setIsFormVisible(!isFormVisible)} 
+          />
+      {isFormVisible && (
+    <div className="p-8 max-w-xl mx-auto bg-white shadow-xl rounded-lg overflow-y-auto max-h-[70vh] custom-scroll">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Form fields remain the same */}
-        {/* ... Your form fields ... */}
-
         <div>
-          <button 
-            type="submit" 
-            className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition duration-200"
-          >
-            {editIndex >= 0 ? 'Update Test Attempt' : 'Test Attempt'}
-          </button>
+          <label className="block text-gray-700 font-semibold mb-2">Test Name</label>
+          <input 
+            type="text" 
+            value={testName} 
+            onChange={(e) => setTestName(e.target.value)} 
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Enter test name"
+            required 
+          />
         </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Total Marks</label>
+          <input 
+            type="text" 
+            value={totalMarks} 
+            onChange={(e) => setTotalMarks(e.target.value)} 
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Enter total marks"
+            required 
+          />
+        </div>
+        <div>
+        <label className="block text-gray-700 font-semibold mb-2">Number of Questions</label>
+        <input 
+          type="text" 
+          value={numQuestions} 
+          onChange={(e) => setNumQuestions(e.target.value)} 
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          placeholder="Enter number of questions"
+          required 
+        />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Pass Grade</label>
+          <input 
+            type="text" 
+            value={passGrade} 
+            onChange={(e) => setPassGrade(e.target.value)} 
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Enter pass grade"
+            required 
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Allowed Attempts</label>
+          <input 
+            type="text" 
+            value={allowedAttempts} 
+            onChange={(e) => setAllowedAttempts(e.target.value)} 
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Enter allowed attempts"
+            required 
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Total Time (hours)</label>
+          <input 
+            type="text" 
+            value={totalTime} 
+            onChange={(e) => setTotalTime(e.target.value)} 
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Enter total time"
+            required 
+          />
+        </div>
+
+        {/* Checkbox to toggle start and end date/time fields */}
+        <div className="flex items-center mb-4">
+          <input 
+            type="checkbox" 
+            checked={isDateTimeEnabled} 
+            onChange={(e) => setIsDateTimeEnabled(e.target.checked)} 
+            className="mr-2"
+          />
+          <label className="text-gray-700 font-semibold">Enable Start/End Date & Time</label>
+        </div>
+
+        {isDateTimeEnabled && (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Start Date</label>
+              <input 
+                type="date" 
+                value={startDate} 
+                onChange={(e) => setStartDate(e.target.value)} 
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                required 
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Start Time</label>
+              <input 
+                type="time" 
+                value={startTime} 
+                onChange={(e) => setStartTime(e.target.value)} 
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                required 
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">End Date</label>
+              <input 
+                type="date" 
+                value={endDate} 
+                onChange={(e) => setEndDate(e.target.value)} 
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                required 
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">End Time</label>
+              <input 
+                type="time" 
+                value={endTime} 
+                onChange={(e) => setEndTime(e.target.value)} 
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                required 
+              />
+            </div>
+          </>
+        )}
+
+        {/* Checkbox to toggle time limit for questions */}
+        <div>
+          <div className="flex items-center">
+            <input 
+              type="checkbox" 
+              checked={isTimeLimitEnabled} 
+              onChange={(e) => setIsTimeLimitEnabled(e.target.checked)} 
+              className="mr-2"
+            />
+          <label className="block text-gray-700 font-semibold">Enable Time Limit per Question</label>
+            
+          </div>
+          {isTimeLimitEnabled && (
+            <div className="mt-4">
+              <label className="block text-gray-700 font-medium mb-2">Time Limit (minutes)</label>
+              <input 
+                type="text" 
+                value={questionTimeLimit} 
+                onChange={(e) => setQuestionTimeLimit(e.target.value)} 
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition"
+                placeholder="Enter time limit"
+                required 
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex items-center mb-4">
+          <input 
+            type="checkbox" 
+            checked={isEntryEnabled} 
+            onChange={(e) => setIsEntryEnabled(e.target.checked)} 
+            className="mr-2"
+          />
+          <label className="text-gray-700 font-semibold">Enable Entry Password</label>
+        </div>
+
+        {isEntryEnabled && (
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Entry Password</label>
+            <input 
+              type="password" 
+              value={entryPassword} 
+              onChange={(e) => setEntryPassword(e.target.value)} 
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              placeholder="Enter entry password"
+            />
+          </div>
+        )}
+
+        <div className="flex items-center mb-4">
+          <input 
+            type="checkbox" 
+            checked={isReviewEnabled} 
+            onChange={(e) => setIsReviewEnabled(e.target.checked)} 
+            className="mr-2"
+          />
+          <label className="text-gray-700 font-semibold">Enable Quit Password</label>
+        </div>
+
+        {isReviewEnabled && (
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Quit Password</label>
+            <input 
+              type="password" 
+              value={quitPassword} 
+              onChange={(e) => setQuitPassword(e.target.value)} 
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              placeholder="Enter quit password"
+            />
+          </div>
+        )}
+
+        <button 
+          type="submit" 
+          className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          {editIndex !== null ? 'Update Test' : 'Add Test'}
+        </button>
       </form>
 
-      {/* Display submitted details */}
-      {submittedDetailsList.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Submitted Details</h2>
+    </div>
+      )}
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold text-indigo-800">Submitted Tests</h2>
+        <ul className="mt-4 space-y-4">
           {submittedDetailsList.map((details, index) => (
-            <div key={index} className="border border-gray-300 p-4 mb-4 rounded-lg">
-              <h3 className="text-lg font-semibold">Test Attempt {index + 1}</h3>
-              <p><strong>Test Name:</strong> {details.testName}</p>
-              <p><strong>Total Marks:</strong> {details.totalMarks}</p>
-              <p><strong>Pass Grade:</strong> {details.passGrade}</p>
-              <p><strong>Allowed Attempts:</strong> {details.allowedAttempts}</p>
-              <p><strong>Total Time:</strong> {details.totalTime} minutes</p>
-              <p><strong>Time Limit Enabled:</strong> {details.isTimeLimitEnabled ? 'Yes' : 'No'}</p>
-              {details.isTimeLimitEnabled && (
-                <p><strong>Time Limit Per Question:</strong> {details.timePerLimit.minutes} minutes</p>
-              )}
-
-              {/* Display Start and End Date/Time if enabled */}
-              {details.isDateTimeEnabled && (
-                <>
-                  <p><strong>Start Date:</strong> {details.startDate}</p>
-                  <p><strong>Start Time:</strong> {details.startTime}</p>
-                  <p><strong>End Date:</strong> {details.endDate}</p>
-                  <p><strong>End Time:</strong> {details.endTime}</p>
-                </>
-              )}
-
-              {/* Edit button */}
-              <button
-                onClick={() => handleEdit(index)}
-                className="mt-2 bg-blue-600 text-white font-semibold py-1 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
+            <li key={index} className="p-4 border border-gray-300 rounded-lg">
+              <h3 className="text-xl font-bold">{details.testName}</h3>
+              <p>Total Marks: {details.totalMarks}</p>
+              <p>Pass Grade: {details.passGrade}</p>
+              <p>Allowed Attempts: {details.allowedAttempts}</p>
+              <p>Total Time: {details.totalTime} hours</p>
+              <button 
+                onClick={() => handleEdit(index)}   
+                className="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
               >
                 Edit
               </button>
-            </div>
+            </li>
           ))}
-        </div>
-      )}
-    </div>
+        </ul>
+      </div>
+    </>
   );
 };
 

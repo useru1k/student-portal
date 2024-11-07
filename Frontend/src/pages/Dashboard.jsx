@@ -7,9 +7,11 @@ import UpcomingEvents from './UpcomingEvents';
 import LeaderBoard from './LeaderBoard';
 import Profile from './Profile';
 import SietHome from './SietHome';
-import Modules from './Modules';
+import Modules from './Modules'; 
 import TestAttempt from './TestAttempt';
 import Editor from './Editor';
+// import Settings from './Settings';
+// import M from './M';
 
 const Dashboard = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(true);
@@ -44,10 +46,12 @@ const Dashboard = () => {
                   <Route path="upcomingevents" element={<UpcomingEvents />} />
                   <Route path="leaderboard" element={<LeaderBoard />} />
                   <Route path="profile" element={<Profile />} />
+                  {/* <Route path="profile" element={<M/>}/> */}
+                  {/* <Route path="settings" element={<Settings />} /> */}
                   <Route path="siethome" element={<SietHome />} />
                   <Route path="courses/modules/:courseId" element={<Modules />} />
                   <Route path="courses/modules/test/:testId" element={<TestAttempt />} />
-                  {/* Removed direct routing to Editor */}
+                 
                 </Routes>
               </div>
             </div>
