@@ -4,6 +4,7 @@ import LoginAdmin from './pages/LoginAdmin';
 import Dashboard from './pages/Dashboard';
 import A_Dashboard from './pages/A_Dashboard';
 import Editor from './pages/Editor'; // Import the Editor component
+import Review from './pages/Review';
 
 const App = () => {
   const [userRole, setUserRole] = useState(null); // Track user role
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/dashboard/*" element={userRole === 'user' ? <Dashboard onLogout={handleLogout} /> : <LoginAdmin onLogin={handleLogin} />} />
         <Route path="/adashboard/*" element={userRole === 'admin' ? <A_Dashboard onLogout={handleLogout} /> : <LoginAdmin onLogin={handleLogin} />} />
         <Route path="/editor" element={<Editor />} />
+        <Route path="review" element={<Review />} />
       </Routes>
     </Router>
   );
