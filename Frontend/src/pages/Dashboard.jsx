@@ -7,18 +7,18 @@ import UpcomingEvents from './UpcomingEvents';
 import LeaderBoard from './LeaderBoard';
 import Profile from './Profile';
 import SietHome from './SietHome';
-import Modules from './Modules'; 
+import Modules from './Modules';
 import TestAttempt from './TestAttempt';
 import Editor from './Editor';
-// import Settings from './Settings';
-// import M from './M';
+import Review from './Review';
 
 const Dashboard = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(true);
   const location = useLocation();
 
-  // Check if the current route is the editor route
-  const isEditorRoute = location.pathname.includes('/editor');
+  // Define paths for routes that should hide TopNav and SideNav
+  const SPECIAL_ROUTES = ['/editor', '/review'];
+  const isSpecialRoute = SPECIAL_ROUTES.some(route => location.pathname.startsWith(route));
 
   const toggleSideNav = () => {
     setIsSideNavOpen(!isSideNavOpen);
@@ -26,18 +26,12 @@ const Dashboard = () => {
 
   return (
     <div className="relative">
-      {/* Conditionally render TopNav and SideNav if not in the Editor route */}
-      {!isEditorRoute && (
+      {/* Conditionally render TopNav and SideNav if not in a special route */}
+      {!isSpecialRoute && (
         <>
-          {/* Fixed TopNav */}
           <TopNav toggleSideNav={toggleSideNav} />
-
-          {/* Flex layout for SideNav and Main Content */}
           <div className="flex h-screen">
-            {/* SideNav with toggleable state */}
             <SideNav isOpen={isSideNavOpen} />
-            
-            {/* Content area, which adjusts based on the SideNav state */}
             <div className={`flex-grow transition-all duration-300 ${isSideNavOpen ? 'ml-64' : 'ml-0'} mt-16`}>
               <div className="p-6">
                 <Routes>
@@ -46,12 +40,9 @@ const Dashboard = () => {
                   <Route path="upcomingevents" element={<UpcomingEvents />} />
                   <Route path="leaderboard" element={<LeaderBoard />} />
                   <Route path="profile" element={<Profile />} />
-                  {/* <Route path="profile" element={<M/>}/> */}
-                  {/* <Route path="settings" element={<Settings />} /> */}
                   <Route path="siethome" element={<SietHome />} />
                   <Route path="courses/modules/:courseId" element={<Modules />} />
                   <Route path="courses/modules/test/:testId" element={<TestAttempt />} />
-                 
                 </Routes>
               </div>
             </div>
@@ -59,8 +50,15 @@ const Dashboard = () => {
         </>
       )}
 
-      {/* Render only the Editor without TopNav and SideNav if on the editor route */}
-      {isEditorRoute && <Editor />}
+      {/* Render only Editor or Review without TopNav and SideNav if on a special route */}
+      {isSpecialRoute && (
+        <div className="p-6">
+          <Routes>
+            <Route path="editor" element={<Editor />} />
+            <Route path="review" element={<Review />} />
+          </Routes>
+        </div>
+      )}
     </div>
   );
 };
