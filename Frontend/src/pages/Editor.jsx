@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Answer from "../components/Answer";
 import Question from "../components/Question";
 import Navbar from "../components/Navbar";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
 const Editor = () => {
-  const [language, setLanguage] = useState("python"); 
+  const [language, setLanguage] = useState("python");
   const [codes, setCodes] = useState(["", ""]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const questionLanguage='any';//db value foe language
+  const [isAnswerVisible, setIsAnswerVisible] = useState(false);
 
   const handleLanguageChange = (selectedLanguage) => {
     setLanguage(selectedLanguage);
-    console.log("Selected language:", selectedLanguage);
   };
 
   const handleCodeChange = (newCode) => {
@@ -34,36 +34,9 @@ const Editor = () => {
     }
   };
 
-  const [tabSwitchCount, setTabSwitchCount] = useState(0);
-  const [isLoggedOut, setIsLoggedOut] = useState(false);
-
-  // Handle tab visibility changes
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setTabSwitchCount((prevCount) => prevCount + 1);
-        
-        if (tabSwitchCount === 0) {
-          alert('Warning: You switched tabs! Stay on this page for the session.');
-        } else if (tabSwitchCount === 1) {
-          alert('You have switched tabs again. You will be logged out soon.');
-        } else if (tabSwitchCount >= 2) {
-          alert('You have been logged out due to switching tabs multiple times.');
-          setIsLoggedOut(true);
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [tabSwitchCount]); // Run useEffect when tabSwitchCount changes
-
-  if (isLoggedOut) {
-    return <p>You have been logged out due to tab switching.</p>;
-  }
+  const toggleAnswerVisibility = () => {
+    setIsAnswerVisible(!isAnswerVisible);
+  };
 
   return (
     <>
@@ -71,26 +44,47 @@ const Editor = () => {
       <Navbar streakCount={1} className="fixed top-0 left-0 w-full z-10" />
 
       {/* Main Content */}
-      <div className="flex-1 w-full flex flex-row min-h-screen pt-[4rem]">
-        <div className="flex-grow p-1">
+      <div className="flex flex-col md:flex-row min-h-screen p-4 space-y-4 md:space-y-0 md:space-x-4 pt-[4rem] overflow-y-auto scroll-smooth">
+        
+        {/* Question component */}
+        <div 
+          className={`w-full rounded-sm ${isAnswerVisible ? "hidden" : ""} md:block md:w-[45%] lg:w-[50%] xl:w-[34%] h-[50vh] md:h-[90vh] flex-shrink-0`}
+        >
           <Question
             currentIndex={currentIndex}
             setCurrentIndex={setCurrentIndex}
             onNext={goToNextQuestion}
             onPrevious={goToPreviousQuestion}
           />
+
+          {/* Toggle button for Answer at the bottom of the Question component */}
+          <button 
+            onClick={toggleAnswerVisibility}
+            className="block md:hidden mx-auto mt-4 text-blue-500 text-2xl"
+          >
+            {isAnswerVisible ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
+          </button>
         </div>
-        <div className="flex-1 w-full flex flex-col p-1">
-          <div className="flex-grow pt-1">
-            <Answer
-              currentIndex={currentIndex}
-              code={codes[currentIndex]}
-              onCodeChange={handleCodeChange}
-              language={language}
-              onLanguageChange={handleLanguageChange}
-              questionLanguage={questionLanguage}
-            />
-          </div>
+
+        {/* Answer component */}
+        <div 
+          className={`w-full rounded-sm ${isAnswerVisible ? "" : "hidden"} md:block md:w-[55%] lg:w-[50%] xl:w-[65%] h-[80vh] md:h-[90vh] flex-shrink-0`}
+        >
+          <Answer
+            currentIndex={currentIndex}
+            code={codes[currentIndex]}
+            onCodeChange={handleCodeChange}
+            language={language}
+            onLanguageChange={handleLanguageChange}
+          />
+
+          {/* Toggle button for Question at the bottom of the Answer component */}
+          <button 
+            onClick={toggleAnswerVisibility}
+            className="block md:hidden mx-auto mt-4 text-blue-500 text-2xl"
+          >
+            {isAnswerVisible ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
+          </button>
         </div>
       </div>
     </>
