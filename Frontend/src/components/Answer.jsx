@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import { FaPlay, FaSun, FaMoon, FaCode } from "react-icons/fa";
+import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane } from "react-icons/fa";
 import "../assets/css/Answer.css";
 
 const Answer = ({
@@ -44,12 +44,20 @@ const Answer = ({
     if (editorElement) {
       editorElement.addEventListener("copy", handleCopyPaste);
       editorElement.addEventListener("paste", handleCopyPaste);
+      editorElement.addEventListener("contextmenu", disableRightClick);
+      editorElement.addEventListener("dragstart", disableDragDrop);
+      editorElement.addEventListener("dragover", disableDragDrop);
+      editorElement.addEventListener("drop", disableDragDrop)
     }
 
     return () => {
       if (editorElement) {
         editorElement.removeEventListener("copy", handleCopyPaste);
         editorElement.removeEventListener("paste", handleCopyPaste);
+        editorElement.removeEventListener("contextmenu", disableRightClick);
+        editorElement.removeEventListener("dragstart", disableDragDrop);
+        editorElement.removeEventListener("dragover", disableDragDrop);
+        editorElement.removeEventListener("drop", disableDragDrop)
       }
     };
   }, [currentIndex, code]);
@@ -58,6 +66,14 @@ const Answer = ({
     setEditorContent(newCode);
     onCodeChange(newCode);
     localStorage.setItem(`code_${currentIndex}`, newCode);
+  };
+  const disableRightClick = (event) => {
+    event.preventDefault();
+    alert("Right-click is disabled.");
+  };
+  const disableDragDrop = (event) => {
+    event.preventDefault();
+    alert("Drag-and-drop functionality is disabled.");
   };
 
   const handleCopyPaste = (event) => {
@@ -74,11 +90,19 @@ const Answer = ({
     document.addEventListener("copy", handleClipboardEvent);
     document.addEventListener("cut", handleClipboardEvent);
     document.addEventListener("paste", handleClipboardEvent);
+    document.addEventListener("contextmenu", disableRightClick);
+    document.addEventListener("dragstart", disableDragDrop);
+    document.addEventListener("dragover", disableDragDrop);
+    document.addEventListener("drop", disableDragDrop);
 
     return () => {
       document.removeEventListener("copy", handleClipboardEvent);
       document.removeEventListener("cut", handleClipboardEvent);
       document.removeEventListener("paste", handleClipboardEvent);
+      document.removeEventListener("contextmenu", disableRightClick);
+      document.removeEventListener("dragstart", disableDragDrop);
+      document.removeEventListener("dragover", disableDragDrop);
+      document.removeEventListener("drop", disableDragDrop);
     };
   }, []);
 
@@ -129,6 +153,11 @@ const Answer = ({
     }
   };
 
+  const handleSubmit = () => {
+    // Implement submission logic here
+    alert("Submitted Successfully");
+  };
+
   const showDifferences = () => {
     const highlighted = [];
     const expectedOutputArray = expectedOutput.split(",");
@@ -151,11 +180,11 @@ const Answer = ({
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 w-[800px] h-[98%]">
+    <div className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 h-full lg:h-[98%]">
       {/* Top bar with theme toggle, language dropdown, etc. */}
-      <div className="top-bar mb-1 flex justify-between items-center">
+      <div className="top-bar mb-1 flex flex-wrap gap-2 justify-between items-center">
         <button
-          className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center mr-2"
+          className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center"
           onClick={() => setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"))}
         >
           {theme === "vs-dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
@@ -174,21 +203,28 @@ const Answer = ({
           <FaPlay />
           <span>Run</span>
         </button>
+        <button
+          className="btn-submit bg-blue-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
+          onClick={handleSubmit}
+        >
+          <FaPaperPlane />
+          <span>Submit</span>
+        </button>
         <select
           value={language}
           onChange={(e) => onLanguageChange(e.target.value)}
-          className="ml-4 bg-white border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring focus:ring-purple-200 text-black"
+          className="ml-4 bg-white border border-gray-300 rounded-md py-1 px-2 sm:py-2 sm:px-4 focus:outline-none focus:ring focus:ring-purple-200 text-black text-xs sm:text-sm"
         >
-          {filteredLanguages.map((lang) => (
-            <option key={lang.value} value={lang.value}>
-              {lang.label}
-            </option>
-          ))}
+          <option value="python">Python</option>
+          <option value="cpp">C++</option>
+          <option value="c">C</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
         </select>
       </div>
 
       {/* Editor container */}
-      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden">
+      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden sm:h-[400px]">
         <MonacoEditor
           height="100%"
           width="100%"
@@ -210,7 +246,7 @@ const Answer = ({
 
       {/* Output section */}
       {showOutput && (
-        <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] overflow-y-auto">
+        <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] sm:h-[300px] overflow-y-auto">
           <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
@@ -229,7 +265,7 @@ const Answer = ({
                 </td>
                 <td className="p-2 border border-gray-600">
                   {showDifference ? (
-                    <div className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none">
+                    <div className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md">
                       {highlightedOutput}
                     </div>
                   ) : (
@@ -243,12 +279,28 @@ const Answer = ({
               </tr>
             </tbody>
           </table>
-          <button
-            className="mt-4 bg-blue-500 text-white py-1 px-2 rounded-md text-sm"
-            onClick={showDifferences}
-          >
-            Show Differences
-          </button>
+          <div className="flex gap-2 mt-4">
+            <button
+              className="toggle-difference bg-gray-700 text-white py-1 px-4 rounded-md"
+              onClick={showDifferences}
+            >
+              {showDifference ? "Hide Differences" : "Show Differences"}
+            </button>
+            <button
+              className="toggle-input bg-gray-700 text-white py-1 px-4 rounded-md"
+              onClick={() => setUseCustomInput((prev) => !prev)}
+            >
+              {useCustomInput ? "Hide Custom Input" : "Custom Input"}
+            </button>
+          </div>
+          {useCustomInput && (
+            <textarea
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              placeholder="Enter custom input..."
+              className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md mt-4"
+            />
+          )}
         </div>
       )}
     </div>
