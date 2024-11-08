@@ -42,17 +42,15 @@ const eventsData = [
 
 const UpcomingEvents = () => {
   return (
-    <div className="p-4">
+    <div className="h-screen overflow-y-auto p-6 custom-scroll bg-gray-100">
       <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
-      <div className="bg-white shadow-md rounded-lg p-4 max-h-96 overflow-y-auto space-y-4 custom-scroll">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {eventsData.map(event => (
-          <div key={event.id} className="border-b pb-4">
-            <h3 className="text-lg font-semibold">{event.title}</h3>
-            <div className="flex justify-between text-gray-600">
-              <div>
-                <p>{event.date}</p>
-                <p>{event.time}</p>
-              </div>
+          <div key={`${event.id}-${event.date}`} className="bg-white shadow-lg rounded-lg p-6 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{event.title}</h3>
+            <div className="text-gray-600">
+              <p className="font-medium">{event.date}</p>
+              <p>{event.time}</p>
             </div>
           </div>
         ))}
@@ -61,4 +59,5 @@ const UpcomingEvents = () => {
   );
 };
 
+	
 export default UpcomingEvents;
