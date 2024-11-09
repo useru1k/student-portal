@@ -15,15 +15,16 @@ const Answer = ({
   const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [expectedOutput, setExpectedOutput] = useState("5,10,15");
-  const [gotOutput, setGotOutput] = useState(""); 
+  const [gotOutput, setGotOutput] = useState("");
   const [compilationMessage, setCompilationMessage] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false);
   const [showDifference, setShowDifference] = useState(false);
-  const [highlightedOutput, setHighlightedOutput] = useState([]); 
+  const [highlightedOutput, setHighlightedOutput] = useState([]);
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-
+  const prefilledCode=`//your prefilled code example here
+  console.log('hello world')`
   const languagesArray = [
     { value: "python", label: "Python" },
     { value: "cpp", label: "C++" },
@@ -47,7 +48,7 @@ const Answer = ({
       editorElement.addEventListener("contextmenu", disableRightClick);
       editorElement.addEventListener("dragstart", disableDragDrop);
       editorElement.addEventListener("dragover", disableDragDrop);
-      editorElement.addEventListener("drop", disableDragDrop)
+      editorElement.addEventListener("drop", disableDragDrop);
     }
 
     return () => {
@@ -57,7 +58,7 @@ const Answer = ({
         editorElement.removeEventListener("contextmenu", disableRightClick);
         editorElement.removeEventListener("dragstart", disableDragDrop);
         editorElement.removeEventListener("dragover", disableDragDrop);
-        editorElement.removeEventListener("drop", disableDragDrop)
+        editorElement.removeEventListener("drop", disableDragDrop);
       }
     };
   }, [currentIndex, code]);
@@ -77,7 +78,7 @@ const Answer = ({
   };
 
   const handleCopyPaste = (event) => {
-    event.preventDefault(); 
+    event.preventDefault();
     alert("Copy-Paste functionality is disabled.");
   };
 
@@ -162,7 +163,10 @@ const Answer = ({
     const highlighted = [];
     const expectedOutputArray = expectedOutput.split(",");
     const gotOutputArray = gotOutput.split(",");
-    const maxLength = Math.max(expectedOutputArray.length, gotOutputArray.length);
+    const maxLength = Math.max(
+      expectedOutputArray.length,
+      gotOutputArray.length
+    );
 
     for (let i = 0; i < maxLength; i++) {
       if (expectedOutputArray[i] !== gotOutputArray[i]) {
@@ -185,7 +189,9 @@ const Answer = ({
       <div className="top-bar mb-1 flex flex-wrap gap-2 justify-between items-center">
         <button
           className="toggle-theme bg-gray-700 text-white py-1 px-3 rounded-md flex items-center justify-center"
-          onClick={() => setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"))}
+          onClick={() =>
+            setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"))
+          }
         >
           {theme === "vs-dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
         </button>
@@ -194,7 +200,9 @@ const Answer = ({
           onClick={() => setShowPrefilledCode((prev) => !prev)}
         >
           <FaCode />
-          <span>{showPrefilledCode ? "Hide Prefilled Code" : "Show Prefilled Code"}</span>
+          <span>
+            {showPrefilledCode ? "Hide Prefilled Code" : "Show Prefilled Code"}
+          </span>
         </button>
         <button
           className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
@@ -222,7 +230,19 @@ const Answer = ({
           <option value="java">Java</option>
         </select>
       </div>
+      {showPrefilledCode && (
+        <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
+          <pre
+            className="whitespace-pre-wrap
 
+border border-gray-300 p-2
+
+bg-gray-800 text-white"
+          >
+            {prefilledCode}
+          </pre>
+        </div>
+      )}
       {/* Editor container */}
       <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden sm:h-[400px]">
         <MonacoEditor
@@ -237,13 +257,26 @@ const Answer = ({
             tabSize: 2,
             wordWrap: "on",
             automaticLayout: true,
-            readOnly: false, 
-            contextmenu: false, 
+            readOnly: false,
+            contextmenu: false,
           }}
           ref={editorRef}
         />
       </div>
+      {showPrefilledCode && (
+        <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
+         
+          <pre
+            className="whitespace-pre-wrap
 
+border border-gray-300 p-2
+
+bg-gray-800 text-white"
+          >
+            {prefilledCode}
+          </pre>
+        </div>
+      )}
       {/* Output section */}
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] sm:h-[300px] overflow-y-auto">
