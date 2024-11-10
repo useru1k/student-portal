@@ -1,4 +1,6 @@
 # Student Portal
+* This project lets students write, compile, and run code in different programming languages to test and see the results.
+  
 * FrontEnd
     * Task 1 : Navbar (Completed).
     * Task 2 : Student and Admin Login (Completed) Remark : Need to change the color.
