@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane } from "react-icons/fa";
 import "../assets/css/Answer.css";
+import { useSearchParams} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const Answer = ({
   currentIndex,
   code,
@@ -31,6 +33,9 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const testId = searchParams.get('testId');
   const filteredLanguages =
     questionLanguage === "any"
       ? languagesArray
@@ -154,8 +159,23 @@ const Answer = ({
   };
 
   const handleSubmit = () => {
-    // Implement submission logic here
-    alert("Submitted Successfully");
+    const marks = Math.floor(Math.random() * 100);
+    const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
+   
+    const submission = {
+      marksObtained: marks,
+      submissionDate: new Date().toLocaleString(),
+      question: "Sample Question",
+      answer: "Sample Answer",
+      feedback: "Good job!",
+      status: status,
+    };
+ 
+    const submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
+    submissions.push(submission);
+    localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
+ 
+    navigate(`/review?testId=${testId}`);
   };
 
   const showDifferences = () => {
