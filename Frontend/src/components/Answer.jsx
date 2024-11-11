@@ -166,7 +166,7 @@ const Answer = ({
       for (let i = 0; i < maxLength; i++) {
         if (expectedOutput[i] !== gotOutput[i]) {
           highlighted.push(
-            <span key={i} style={{ backgroundColor: "red" }}>
+            <span key={i} style={{ backgroundColor: "yellow", color:"black" }}>
               {gotOutput[i] || " "}
             </span>
           );
