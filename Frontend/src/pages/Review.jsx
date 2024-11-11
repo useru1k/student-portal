@@ -1,11 +1,11 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
 const Review = () => {
   const [searchParams] = useSearchParams();
   const testId = searchParams.get('testId');
   const fromEditor = searchParams.get('fromEditor') === 'true';
-
+  const codes=useSelector((state)=>state.codes.codes);
   // Retrieve submissions from localStorage
   const submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
 
