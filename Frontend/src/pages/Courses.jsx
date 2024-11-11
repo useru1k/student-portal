@@ -87,80 +87,82 @@ const Courses = () => {
 
   return (
     <>
-      <h2 className="text-2xl font-bold">COURSE OVERVIEW</h2>
-      <div className="custom-scroll p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-        <div className="mt-6 flex flex-wrap justify-end items-center space-y-2 md:space-y-0">
-          <div className="relative w-full max-w-xs md:mr-4">
-            <input
-              type="text"
-              placeholder="Search courses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border rounded-full w-full"
-            />
-            <Search className="absolute left-3 top-2.5 text-gray-500" size={20} />
-          </div>
-          <select
-            className="border rounded-full px-4 py-2 w-full max-w-xs md:max-w-none md:w-auto md:mr-4"
-            onChange={(e) => setFilter(e.target.value)}
-            value={filter}
-          >
-            <option value="all">All Courses</option>
-            <option value="favorites">Favorites</option>
-            <option value="inProgress">In Progress</option>
-            <option value="new">New</option>
-            <option value="completed">Completed</option>
-          </select>
-          <select
-            className="border rounded-full px-4 py-2 w-full max-w-xs md:max-w-none md:w-auto"
-            onChange={(e) => setView(e.target.value)}
-            value={view}
-          >
-            <option value="card">Card View</option>
-            <option value="list">List View</option>
-          </select>
-        </div>
-        <div className={`mt-6 ${view === 'card' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'} overflow-x-auto overflow-y-auto`}>
-          {filteredCourses.map((course) => (
-            <div
-              key={course.id}
-              className={`bg-white shadow-md rounded-lg overflow-hidden relative cursor-pointer ${
-                view === 'card' ? '' : 'flex items-center p-4'
-              }`}
-              onClick={() => handleCourseClick(course.id)}
-            >
-              <img
-                src={course.image}
-                alt={course.name}
-                className={`${view === 'card' ? 'w-full h-40' : 'w-20 h-20 mr-4'} object-cover`}
+      <div className="bg-white font-bold text-gray-800 container mb-3">
+        <h2 className="text-2xl font-bold">COURSE OVERVIEW</h2>
+        <div className="custom-scroll p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <div className="mt-6 flex flex-wrap justify-end items-center space-y-2 md:space-y-0">
+            <div className="relative w-full max-w-xs md:mr-4">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border rounded-full w-full"
               />
-              <div className="p-4 flex justify-between items-center w-full">
-                <div>
-                  <h3 className="text-lg font-semibold">{course.name}</h3>
-                  {view === 'list' && (
-                    <div className="text-sm font-medium text-gray-700">Progress: {course.progress}%</div>
-                  )}
-                </div>
-                <div
-                  className={`cursor-pointer transition-all duration-300 ${
-                    favorites.has(course.id) ? 'text-blue-400' : 'text-gray-400'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(course.id);
-                  }}
-                >
-                  <GiRoundStar size={24} />
-                </div>
-              </div>
-              {view === 'card' && (
-                <div className="flex items-center mt-2 ml-4">
-                  <CircularProgress progress={course.progress} />
-                  <div className="ml-4 text-sm font-medium text-gray-700">Progress: {course.progress}%</div>
-                </div>
-              )}
+              <Search className="absolute left-3 top-2.5 text-gray-500" size={20} />
             </div>
-          ))}
+            <select
+              className="border rounded-full px-4 py-2 w-full max-w-xs md:max-w-none md:w-auto md:mr-4"
+              onChange={(e) => setFilter(e.target.value)}
+              value={filter}
+            >
+              <option value="all">All Courses</option>
+              <option value="favorites">Favorites</option>
+              <option value="inProgress">In Progress</option>
+              <option value="new">New</option>
+              <option value="completed">Completed</option>
+            </select>
+            <select
+              className="border rounded-full px-4 py-2 w-full max-w-xs md:max-w-none md:w-auto"
+              onChange={(e) => setView(e.target.value)}
+              value={view}
+            >
+              <option value="card">Card View</option>
+              <option value="list">List View</option>
+            </select>
+          </div>
+          <div className={`mt-6 ${view === 'card' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'} overflow-x-auto overflow-y-auto`}>
+            {filteredCourses.map((course) => (
+              <div
+                key={course.id}
+                className={`bg-white shadow-md rounded-lg overflow-hidden relative cursor-pointer ${
+                  view === 'card' ? '' : 'flex items-center p-4'
+                }`}
+                onClick={() => handleCourseClick(course.id)}
+              >
+                <img
+                  src={course.image}
+                  alt={course.name}
+                  className={`${view === 'card' ? 'w-full h-40' : 'w-20 h-20 mr-4'} object-cover`}
+                />
+                <div className="p-4 flex justify-between items-center w-full mb-3">
+                  <div>
+                    <h3 className="text-lg font-semibold">{course.name}</h3>
+                    {view === 'list' && (
+                      <div className="text-sm font-medium text-gray-700">Progress: {course.progress}%</div>
+                    )}
+                  </div>
+                  <div
+                    className={`cursor-pointer transition-all duration-300 ${
+                      favorites.has(course.id) ? 'text-blue-400' : 'text-gray-400'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(course.id);
+                    }}
+                  >
+                    <GiRoundStar size={24} />
+                  </div>
+                </div>
+                {view === 'card' && (
+                  <div className="flex items-center mt-2 ml-4 mb-3">
+                    <CircularProgress progress={course.progress} />
+                    <div className="ml-4 text-sm font-medium text-gray-700">Progress: {course.progress}%</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>
