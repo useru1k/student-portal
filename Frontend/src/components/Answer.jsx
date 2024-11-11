@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane } from "react-icons/fa";
 import "../assets/css/Answer.css";
-
 const Answer = ({
   currentIndex,
   code,
@@ -160,27 +159,24 @@ const Answer = ({
   };
 
   const showDifferences = () => {
-    const highlighted = [];
-    const expectedOutputArray = expectedOutput.split(",");
-    const gotOutputArray = gotOutput.split(",");
-    const maxLength = Math.max(
-      expectedOutputArray.length,
-      gotOutputArray.length
-    );
+    if (!showDifference) {
+      const highlighted = [];
+      const maxLength = Math.max(expectedOutput.length, gotOutput.length);
 
-    for (let i = 0; i < maxLength; i++) {
-      if (expectedOutputArray[i] !== gotOutputArray[i]) {
-        highlighted.push(
-          <span key={i} style={{ backgroundColor: "red" }}>
-            {gotOutputArray[i] || " "}
-          </span>
-        );
-      } else {
-        highlighted.push(<span key={i}>{gotOutputArray[i] || " "}</span>);
+      for (let i = 0; i < maxLength; i++) {
+        if (expectedOutput[i] !== gotOutput[i]) {
+          highlighted.push(
+            <span key={i} style={{ backgroundColor: "red" }}>
+              {gotOutput[i] || " "}
+            </span>
+          );
+        } else {
+          highlighted.push(<span key={i}>{gotOutput[i] || " "}</span>);
+        }
       }
+      setHighlightedOutput(highlighted);
     }
-    setHighlightedOutput(highlighted);
-    setShowDifference((prev) => !prev);
+    setShowDifference(!showDifference);
   };
 
   return (
