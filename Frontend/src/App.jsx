@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginAdmin from './pages/LoginAdmin';
 import Dashboard from './pages/Dashboard';
 import A_Dashboard from './pages/A_Dashboard';
 import Editor from './pages/Editor'; // Import the Editor component
 import Review from './pages/Review';
-
+import {Provider} from 'react-redux';
+import {store} from './redux/store';
 const App = () => {
   const [userRole, setUserRole] = useState(null); // Track user role
-
+  // const container = document.getElementById('root');
+  // const root = ReactDOM.createRoot(container);
   // Load user role from local storage on component mount
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
@@ -28,6 +31,8 @@ const App = () => {
   };
 
   return (
+    
+    <Provider store={store}>
     <Router>
       <Routes>
         <Route path="/" element={<LoginAdmin onLogin={handleLogin} />} />
@@ -37,7 +42,11 @@ const App = () => {
         <Route path="review" element={<Review />} />
       </Routes>
     </Router>
+    </Provider>
+    
   );
 };
+
+
 
 export default App;
