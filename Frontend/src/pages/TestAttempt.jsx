@@ -37,7 +37,7 @@ const TestAttempt = () => {
 
   if (!test) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
+      <div className="flex items-center justify-center min-h-screen rounded-sm bg-gray-50 p-4">
         <div className="text-center space-y-4">
           <AlertTriangle className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-yellow-500" />
           <p className="text-lg sm:text-xl font-semibold text-gray-700">Test not found</p>
@@ -60,7 +60,7 @@ const TestAttempt = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-y-auto">
+    <div className=" bg-gray-100 overflow-y-auto rounded-sm">
       {/* Main Content Container */}
       <div className="bg-gray-100 container mx-auto p-2 sm:p-4 md:p-6 max-w-7xl">
         {/* Header Card */}
