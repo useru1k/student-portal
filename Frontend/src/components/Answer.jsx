@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane } from "react-icons/fa";
+import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane, FaCheckCircle } from "react-icons/fa";
 import "../assets/css/Answer.css";
 import { useSearchParams} from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+// Icon display function
+const OutputIcon = () => {
+  return <FaCheckCircle style={{ color: "green", marginLeft: "5px" }} />;
+};
 const Answer = ({
   currentIndex,
   code,
@@ -299,31 +303,48 @@ bg-gray-800 text-white"
           <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
-                <th className="w-1/2 p-2">Expected Output</th>
-                <th className="w-1/2 p-2">Got Output</th>
+                <th classNmae="w-1/3 p-2">Input</th>
+                <th className="w-1/3 p-2">Expected Output</th>
+                <th className="w-1/3 p-2">Got Output</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td className="p-2 border border-gray-600">
                   <textarea
+                    value={"1,2,3"}
+                    readOnly
+                    className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                    style={{ display:"flex", height: "80px", width: "100%" }}
+                  />
+                </td>
+                <td className="p-2 border border-gray-600">
+                  <textarea
                     value={expectedOutput}
                     readOnly
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                    style={{ display:"flex", height: "80px", width: "100%" }}
                   />
                 </td>
                 <td className="p-2 border border-gray-600">
                   {showDifference ? (
-                    <div className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md">
+                    <div
+                    className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
+                    style={{ position:"sticky",height: "80px", width: "100%", overflowY: "auto" }}
+                    >
                       {highlightedOutput}
+                     
                     </div>
                   ) : (
                     <textarea
-                      value={gotOutput}
+                      value={gotOutput} 
+                     
                       readOnly
                       className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
+                      style={{display:"flex", height: "80px", width: "100%" }}
                     />
                   )}
+
                 </td>
               </tr>
             </tbody>
@@ -334,6 +355,7 @@ bg-gray-800 text-white"
               onClick={showDifferences}
             >
               {showDifference ? "Hide Differences" : "Show Differences"}
+              
             </button>
             <button
               className="toggle-input bg-gray-700 text-white py-1 px-4 rounded-md"
