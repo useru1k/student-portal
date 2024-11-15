@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane, FaCheckCircle } from "react-icons/fa";
 import "../assets/css/Answer.css";
+import { useDispatch, useSelector } from "react-redux";
+import { setCodes, updateCode,updateOutput} from "../redux/codeSlice";
 import { useSearchParams} from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 // Icon display function
@@ -15,12 +17,16 @@ const Answer = ({
   language,
   onLanguageChange,
   questionLanguage,
+  setShowOutput,
+  showOutput
 }) => {
+  const dispatch = useDispatch();
+  const codes = useSelector((state) => state.codes.codes);
   const [theme, setTheme] = useState("vs-dark");
-  const [showOutput, setShowOutput] = useState(false);
+  //const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [expectedOutput, setExpectedOutput] = useState("5,10,15");
-  const [gotOutput, setGotOutput] = useState("");
+  const [outputs, setOutputs] = useState([]);
   const [compilationMessage, setCompilationMessage] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false);
   const [showDifference, setShowDifference] = useState(false);
@@ -46,8 +52,9 @@ const Answer = ({
       : languagesArray.filter((lang) => lang.value === questionLanguage);
 
   useEffect(() => {
-    const storedCode = localStorage.getItem(`code_${currentIndex}`);
+    const storedCode =codes[currentIndex]?.code|| localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
+
 
     const editorElement = editorRef.current?.container;
     if (editorElement) {
@@ -74,7 +81,10 @@ const Answer = ({
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
+    occurrencesHighlight: 'off';
     localStorage.setItem(`code_${currentIndex}`, newCode);
+    dispatch(updateCode({ index: currentIndex, code: newCode, output: codes[currentIndex]?.output || "" }));
+
   };
   const disableRightClick = (event) => {
     event.preventDefault();
@@ -141,7 +151,7 @@ const Answer = ({
   const compileCode = async () => {
     setShowDifference(false);
     setShowOutput(true);
-    setGotOutput("Compiling...");
+    dispatch(updateOutput({ index: currentIndex, output: "Compiling..." }));
     setCompilationMessage("");
 
     try {
@@ -156,9 +166,9 @@ const Answer = ({
         throw new Error(errorMessage);
       }
       const result = await response.text();
-      setGotOutput(result);
+      dispatch(updateOutput({ index: currentIndex, output: result }));
     } catch (error) {
-      setGotOutput(`Error: ${error.message}`);
+      dispatch(updateOutput({ index: currentIndex, output: errorMessage }));
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };
@@ -186,6 +196,7 @@ const Answer = ({
   const showDifferences = () => {
     if (!showDifference) {
       const highlighted = [];
+      const gotOutput = codes[currentIndex]?.output || ""; 
       const maxLength = Math.max(expectedOutput.length, gotOutput.length);
 
       for (let i = 0; i < maxLength; i++) {
@@ -304,7 +315,7 @@ bg-gray-800 text-white"
           <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
-                <th classNmae="w-1/3 p-2">Input</th>
+                <th className="w-1/3 p-2">Input</th>
                 <th className="w-1/3 p-2">Expected Output</th>
                 <th className="w-1/3 p-2">Got Output</th>
               </tr>
@@ -321,7 +332,7 @@ bg-gray-800 text-white"
                 </td>
                 <td className="p-2 border border-gray-600">
                   <textarea
-                    value={expectedOutput}
+                   value={expectedOutput}
                     readOnly
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
                     style={{ display:"flex", height: "80px", width: "100%" }}
@@ -338,7 +349,7 @@ bg-gray-800 text-white"
                     </div>
                   ) : (
                     <textarea
-                      value={gotOutput} 
+                      value={codes[currentIndex]?.output} 
                      
                       readOnly
                       className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"

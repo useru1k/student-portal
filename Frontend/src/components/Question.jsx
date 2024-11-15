@@ -3,7 +3,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Question1 from './Question1';
 import Question2 from './Question2';
 
-const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious }) => {
+const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious ,showOutput,setShowOutput}) => {
   const [timers, setTimers] = React.useState([30, 30]);
   const timerRef = useRef(null);
   const questions = [<Question1 key={0} />, <Question2 key={1} />];
