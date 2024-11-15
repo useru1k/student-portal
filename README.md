@@ -10,7 +10,7 @@
     * Task 5 : Admin DashBoard (Partially Completed).
     * Task 6 : Copy and paste Option need to disable (Completed).
     * Task 7 : Tab Switching Option also need to disable (Completed).
-    * Task 8 : Show Differ Output (Partially Completed).
+    * Task 8 : Show Differ Output (Completed).
 * BackEnd
     * Task 1 : Time control (Compeleted) Remark : Need to combine with FrontEnd. (Completed)
     * Task 2 : Compile work (Completed) Remark : Compile work run with API but not on client work.(No need) - (Need to spilt into 3)
@@ -18,3 +18,4 @@
     * Task 4 : DB Schema : Question page Schema is Completed. Remark : Need to integrated with client.
     * Task 5 : Html Compare (Partially Completed).
     * Task 6 : Cpu and memory Monitoring (Completed). Need to make a UI for Display.
+    * Task 7 : Need to get the input from server and compile it.(Not Completed)
