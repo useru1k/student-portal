@@ -7,36 +7,39 @@ import { useSelector,useDispatch } from "react-redux";
 import { updateCode } from '../redux/codeSlice'
 const Editor = () => {
   const [language, setLanguage] = useState("python");
-  //const [codes, setCodes] = useState(["", ""]);
+  const [codes, setCodes] = useState(["", ""]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnswerVisible, setIsAnswerVisible] = useState(false);
-  const dispatch=useDispatch();
-  const codes=useSelector((state)=>state.codes.codes);
+  // const dispatch=useDispatch();
+  // const codes=useSelector((state)=>state.codes.codes);
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const [showOutput, setShowOutput] = useState(false);
 
   const handleLanguageChange = (selectedLanguage) => {
     setLanguage(selectedLanguage);
   };
 
   const handleCodeChange = (newCode) => {
-    // setCodes((prevCodes) => {
-    //   const updatedCodes = [...prevCodes];
-    //   updatedCodes[currentIndex] = newCode;
-    //   return updatedCodes;
-    // });
-    dispatch(updateCode({index:currentIndex,value:newCode}));
+    setCodes((prevCodes) => {
+      const updatedCodes = [...prevCodes];
+      updatedCodes[currentIndex] = newCode;
+      return updatedCodes;
+    });
+    //dispatch(updateCode({index:currentIndex,value:newCode}));
   };
 
   const goToNextQuestion = () => {
     if (currentIndex < codes.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setShowOutput(false);
     }
   };
 
   const goToPreviousQuestion = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+      setShowOutput(false)
     }
   };
 
@@ -83,6 +86,8 @@ const Editor = () => {
             setCurrentIndex={setCurrentIndex}
             onNext={goToNextQuestion}
             onPrevious={goToPreviousQuestion}
+            setShowOutput={setShowOutput}
+            showOutput={showOutput}
           />
           <button 
             onClick={toggleAnswerVisibility}
@@ -100,6 +105,8 @@ const Editor = () => {
             onCodeChange={handleCodeChange}
             language={language}
             onLanguageChange={handleLanguageChange}
+            setShowOutput={setShowOutput}
+            showOutput={showOutput}
           />
           <button 
             onClick={toggleAnswerVisibility}
