@@ -119,11 +119,12 @@ const Answer = ({
     const handleKeyDown = (e) => {
       if (
         (e.ctrlKey || e.metaKey) &&
-        (e.key === "c" || e.key === "x" || e.key === "v")
+        (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey) 
       ) {
         e.preventDefault();
         alert("Clipboard actions (copy, cut, paste) are disabled");
       }
+      
       if (e.key === "Insert" || (e.key === "Delete" && e.shiftKey)) {
         e.preventDefault();
         alert("Alternative clipboard actions are disabled");
