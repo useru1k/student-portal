@@ -20,6 +20,9 @@ const Review = () => {
     // Perform any final submission actions here if needed
     window.close();
   };
+  const handleRemoveCode = (index) => {
+    dispatch(removeCode(index));
+  };
 
   // Handle just closing the window
   const handleClose = () => {
@@ -40,7 +43,23 @@ const Review = () => {
         <h3 className="text-md font-bold">Answer:</h3>
         <p>{submission.answer || "No answer provided."}</p>
       </div>
-
+        {/* Display codes and their outputs */}
+      <div className="codes-output mb-4">
+        <h3 className="text-md font-bold">Submitted Codes and Outputs:</h3>
+        {codes.length === 0 ? (
+          <p>No codes available.</p>
+        ) : (
+          codes.map((codeItem, index) => (
+            <div key={index} className="code-output-item mb-2">
+              <h4 className="text-sm font-semibold">Code {index + 1}:</h4>
+              <pre className="bg-gray-100 p-2 rounded">{codeItem.code}</pre>
+              <h5 className="text-sm font-semibold mt-2">Output:</h5>
+              <pre className="bg-gray-200 p-2 rounded">{codeItem.output}</pre>
+              <button onClick={() => handleRemoveCode(index)}>Remove Code</button>
+            </div>
+          ))
+        )}
+         </div>
       {/* Conditionally render buttons */}
       {fromEditor ? (
         <button
