@@ -32,26 +32,19 @@ const Review = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
-      {/* Fixed Header */}
-      <div className="p-4 bg-white border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-center text-gray-800">
-          Test Review
-        </h1>
-      </div>
-
-      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 border border-gray-200">
           <div className="space-y-6">
-            {/* Question Section */}
             <div>
+              <h1 className="text-2xl font-bold text-center text-gray-800">
+                Test Review
+              </h1>
               <h3 className="text-lg font-semibold text-gray-700">Question:</h3>
               <p className="mt-2 text-gray-600">
                 {submission.question || "No question available."}
               </p>
             </div>
 
-            {/* Answer Section */}
             <div>
               <h3 className="text-lg font-semibold text-gray-700">Answer:</h3>
               <p className="mt-2 text-gray-600">
@@ -59,7 +52,6 @@ const Review = () => {
               </p>
             </div>
 
-            {/* Codes Section */}
             <div>
               <h3 className="text-lg font-semibold text-gray-700">
                 Submitted Codes and Outputs:
@@ -96,7 +88,6 @@ const Review = () => {
             </div>
           </div>
 
-          {/* Buttons */}
           <div className="mt-8 flex justify-center pb-4">
             {fromEditor ? (
               <button
