@@ -1,11 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane, FaCheckCircle } from "react-icons/fa";
+import {
+  FaPlay,
+  FaSun,
+  FaMoon,
+  FaCode,
+  FaPaperPlane,
+  FaCheckCircle,
+} from "react-icons/fa";
 import "../assets/css/Answer.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setCodes, updateCode,updateOutput} from "../redux/codeSlice";
-import { CircleChevronDown } from 'lucide-react';
-import { useSearchParams} from "react-router-dom";
+import { setCodes, updateCode, updateOutput } from "../redux/codeSlice";
+import { CircleChevronDown } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 // Icon display function
 const OutputIcon = () => {
@@ -19,7 +26,7 @@ const Answer = ({
   onLanguageChange,
   questionLanguage,
   setShowOutput,
-  showOutput
+  showOutput,
 }) => {
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
@@ -35,8 +42,8 @@ const Answer = ({
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-  const prefilledCode=`//your prefilled code example here
-  console.log('hello world')`
+  const prefilledCode = `//your prefilled code example here
+  console.log('hello world')`;
   const languagesArray = [
     { value: "python", label: "Python" },
     { value: "cpp", label: "C++" },
@@ -44,18 +51,19 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
+  const input = 10;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const testId = searchParams.get('testId');
+  const testId = searchParams.get("testId");
   const filteredLanguages =
     questionLanguage === "any"
       ? languagesArray
       : languagesArray.filter((lang) => lang.value === questionLanguage);
 
   useEffect(() => {
-    const storedCode =codes[currentIndex]?.code|| localStorage.getItem(`code_${currentIndex}`);
+    const storedCode =
+      codes[currentIndex]?.code || localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
-
 
     const editorElement = editorRef.current?.container;
     if (editorElement) {
@@ -82,10 +90,15 @@ const Answer = ({
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
-    occurrencesHighlight: 'off';
+    occurrencesHighlight: "off";
     localStorage.setItem(`code_${currentIndex}`, newCode);
-    dispatch(updateCode({ index: currentIndex, code: newCode, output: codes[currentIndex]?.output || "" }));
-
+    dispatch(
+      updateCode({
+        index: currentIndex,
+        code: newCode,
+        output: codes[currentIndex]?.output || "",
+      })
+    );
   };
   const disableRightClick = (event) => {
     event.preventDefault();
@@ -130,12 +143,12 @@ const Answer = ({
     const handleKeyDown = (e) => {
       if (
         (e.ctrlKey || e.metaKey) &&
-        (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey) 
+        (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey)
       ) {
         e.preventDefault();
         alert("Clipboard actions (copy, cut, paste) are disabled");
       }
-      
+
       if (e.key === "Insert" || (e.key === "Delete" && e.shiftKey)) {
         e.preventDefault();
         alert("Alternative clipboard actions are disabled");
@@ -154,12 +167,17 @@ const Answer = ({
     setShowOutput(true);
     dispatch(updateOutput({ index: currentIndex, output: "Compiling..." }));
     setCompilationMessage("");
-
+    const inputToSend = customInput ? customInput : input;
+    console.log(inputToSend);
     try {
       const response = await fetch("http://localhost:3000/compile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: editorContent, language, customInput }),
+        body: JSON.stringify({
+          code: editorContent,
+          language,
+          input: inputToSend,
+        }),
       });
 
       if (!response.ok) {
@@ -169,7 +187,7 @@ const Answer = ({
       const result = await response.text();
       dispatch(updateOutput({ index: currentIndex, output: result }));
     } catch (error) {
-      dispatch(updateOutput({ index: currentIndex, output: errorMessage }));
+      dispatch(updateOutput({ index: currentIndex, output: error.message }));
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };
@@ -177,7 +195,7 @@ const Answer = ({
   const handleSubmit = () => {
     const marks = Math.floor(Math.random() * 100);
     const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
-   
+
     const submission = {
       marksObtained: marks,
       submissionDate: new Date().toLocaleString(),
@@ -186,24 +204,25 @@ const Answer = ({
       feedback: "Good job!",
       status: status,
     };
- 
-    const submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
+
+    const submissions =
+      JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
- 
+
     navigate(`/review?testId=${testId}`);
   };
 
   const showDifferences = () => {
     if (!showDifference) {
       const highlighted = [];
-      const gotOutput = codes[currentIndex]?.output || ""; 
+      const gotOutput = codes[currentIndex]?.output || "";
       const maxLength = Math.max(expectedOutput.length, gotOutput.length);
 
       for (let i = 0; i < maxLength; i++) {
         if (expectedOutput[i] !== gotOutput[i]) {
           highlighted.push(
-            <span key={i} style={{ backgroundColor: "yellow", color:"black" }}>
+            <span key={i} style={{ backgroundColor: "yellow", color: "black" }}>
               {gotOutput[i] || " "}
             </span>
           );
@@ -298,7 +317,6 @@ bg-gray-800 text-white"
       </div>
       {showPrefilledCode && (
         <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
-         
           <pre
             className="whitespace-pre-wrap
 
@@ -314,13 +332,13 @@ bg-gray-800 text-white"
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] sm:h-[300px] overflow-y-auto">
           <div className="flex flex-roe justify-end items-end">
-              <button
-    className="btn-output-toggle py-1 px-2 rounded-md flex justify-end items-end space-x-1 text-sm"
-    onClick={() => setShowOutput((prev) => !prev)}
-  >
-    <CircleChevronDown/>
-  </button>
-  </div>
+            <button
+              className="btn-output-toggle py-1 px-2 rounded-md flex justify-end items-end space-x-1 text-sm"
+              onClick={() => setShowOutput((prev) => !prev)}
+            >
+              <CircleChevronDown />
+            </button>
+          </div>
 
           <table className="w-full table-fixed">
             <thead>
@@ -334,39 +352,41 @@ bg-gray-800 text-white"
               <tr>
                 <td className="p-2 border border-gray-600">
                   <textarea
-                    value={"1,2,3"}
+                    value={"10"}
                     readOnly
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
-                    style={{ display:"flex", height: "80px", width: "100%" }}
+                    style={{ display: "flex", height: "80px", width: "100%" }}
                   />
                 </td>
                 <td className="p-2 border border-gray-600">
                   <textarea
-                   value={expectedOutput}
+                    value={expectedOutput}
                     readOnly
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
-                    style={{ display:"flex", height: "80px", width: "100%" }}
+                    style={{ display: "flex", height: "80px", width: "100%" }}
                   />
                 </td>
                 <td className="p-2 border border-gray-600">
                   {showDifference ? (
                     <div
-                    className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
-                    style={{ position:"sticky",height: "80px", width: "100%", overflowY: "auto" }}
+                      className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
+                      style={{
+                        position: "sticky",
+                        height: "80px",
+                        width: "100%",
+                        overflowY: "auto",
+                      }}
                     >
                       {highlightedOutput}
-                     
                     </div>
                   ) : (
                     <textarea
-                      value={codes[currentIndex]?.output} 
-                     
+                      value={codes[currentIndex]?.output}
                       readOnly
                       className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
-                      style={{display:"flex", height: "80px", width: "100%" }}
+                      style={{ display: "flex", height: "80px", width: "100%" }}
                     />
                   )}
-
                 </td>
               </tr>
             </tbody>
@@ -377,11 +397,11 @@ bg-gray-800 text-white"
               onClick={showDifferences}
             >
               {showDifference ? "Hide Differences" : "Show Differences"}
-              
             </button>
             <button
               className="toggle-input bg-gray-700 text-white py-1 px-4 rounded-md"
               onClick={() => setUseCustomInput((prev) => !prev)}
+              onBlur={() => setCustomInput("")}
             >
               {useCustomInput ? "Hide Custom Input" : "Custom Input"}
             </button>
