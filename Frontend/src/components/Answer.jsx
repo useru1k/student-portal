@@ -4,6 +4,7 @@ import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane, FaCheckCircle } from "reac
 import "../assets/css/Answer.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setCodes, updateCode,updateOutput} from "../redux/codeSlice";
+import { CircleChevronDown } from 'lucide-react';
 import { useSearchParams} from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 // Icon display function
@@ -312,6 +313,15 @@ bg-gray-800 text-white"
       {/* Output section */}
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] sm:h-[300px] overflow-y-auto">
+          <div className="flex flex-roe justify-end items-end">
+              <button
+    className="btn-output-toggle py-1 px-2 rounded-md flex justify-end items-end space-x-1 text-sm"
+    onClick={() => setShowOutput((prev) => !prev)}
+  >
+    <CircleChevronDown/>
+  </button>
+  </div>
+
           <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
