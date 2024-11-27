@@ -19,3 +19,4 @@
     * Task 5 : Html Compare (Partially Completed).
     * Task 6 : Cpu and memory Monitoring (Completed). Need to make a UI for Display.
     * Task 7 : Need to get the input from server and compile it.(Not Completed)
+    * Task 8 : Black and White word to compile work (Not Completed).
