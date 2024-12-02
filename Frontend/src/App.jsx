@@ -8,6 +8,7 @@ import Editor from './pages/Editor'; // Import the Editor component
 import Review from './pages/Review';
 import {Provider} from 'react-redux';
 import {store} from './redux/store';
+import FinishAttempt from './pages/FinishAttempt';
 const App = () => {
   const [userRole, setUserRole] = useState(null); // Track user role
   // const container = document.getElementById('root');
@@ -40,13 +41,12 @@ const App = () => {
         <Route path="/adashboard/*" element={userRole === 'admin' ? <A_Dashboard onLogout={handleLogout} /> : <LoginAdmin onLogin={handleLogin} />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="review" element={<Review />} />
+        <Route path="finishattempt" element={<FinishAttempt />} />
       </Routes>
     </Router>
     </Provider>
     
   );
 };
-
-
 
 export default App;
