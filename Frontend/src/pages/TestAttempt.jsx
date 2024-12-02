@@ -32,7 +32,7 @@ const TestAttempt = () => {
   }, [testId]);
 
   const handleAttempt = () => {
-    window.open(`/editor?testId=${testId}`, '_blank', 'width=800,height=600');
+    window.open(`/editor?testId=${testId}`, '_blank', 'width=w-screen,height=h-screen','toolbar=no,menubar=no');
   };
 
   if (!test) {
@@ -146,13 +146,11 @@ const TestAttempt = () => {
                           <span>{submission.submissionDate}</span>
                         </div>
                         <button
-                            onClick={() =>
-                            window.open(`/review?testId=${testId}&attemptIndex=${index}`, '_blank', 'width=' + window.screen.width + ',height=' + window.screen.height + ',top=0,left=0,fullscreen=yes')
-                            }
-                            className="text-white font-medium bg-green-600 hover:bg-green-700 rounded-md px-4 py-2"
-                            >
-                              Review
-                            </button>
+                          onClick={() => window.location.href = `/review?testId=${testId}&attemptIndex=${index}`}
+                          className="block text-center text-sm text-white font-medium pt-2 border-t border-gray-200 bg-green-600 hover:bg-green-700 rounded-md px-4 py-2"
+                        >
+                          Review Attempt
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -192,10 +190,8 @@ const TestAttempt = () => {
                             </td>
                             <td className="px-3 sm:px-6 py-3 text-sm">
                             <button
-                            onClick={() =>
-                            window.open(`/review?testId=${testId}&attemptIndex=${index}`, '_blank', 'width=' + window.screen.width + ',height=' + window.screen.height + ',top=0,left=0,fullscreen=yes')
-                            }
-                            className="text-white font-medium bg-green-600 hover:bg-green-700 rounded-md px-4 py-2"
+                              onClick={() => window.location.href = `/review?testId=${testId}&attemptIndex=${index}`}
+                              className="text-white font-medium bg-green-600 hover:bg-green-700 rounded-md px-4 py-2"
                             >
                               Review
                             </button>
