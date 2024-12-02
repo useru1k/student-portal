@@ -31,32 +31,48 @@ app.post("/compile", (req, res) => {
   const { code, language, input } = req.body;
   console.log("Received code:", code);
   console.log("Received language:", language);
+  if (!Array.isArray(input)) {
+    return res.status(400).send("Input should be an array.");
+  }
+  
+  const formattedInput = input.join(" "); // newline-separated inputs
+  //const formattedInput = JSON.stringify(input.join("\n"));
+  // const fileName = "TempCode.py";
+  // const filePath = path.join(__dirname, "code_storage", fileName);
+  const pythonInput = input.join("\n"); // Newline-separated inputs
+  const escapedInput = pythonInput.replace(/(["`$\\])/g, '\\$1');
   if (language === "python") {
     const fileName = "TempCode.py";
     const filePath = path.join(__dirname, "code_storage", fileName);
 
+    // Join input array into newline-separated string
+    const formattedInput = input.join("\n");
+
     fs.writeFile(filePath, code, (err) => {
-      if (err)
-        return res
-          .status(500)
-          .send("Error writing Python file: " + err.message);
+        if (err)
+            return res
+                .status(500)
+                .send("Error writing Python file: " + err.message);
 
-      // Use echo with input, ensuring no extra quotes are added
-      exec(
-        `echo ${input} | python3 ${filePath}`,
-        (runErr, runStdout, runStderr) => {
-          if (runErr) {
-            return res.status(400).send(`Python Execution Error: ${runStderr}`);
-          }
-          res.send(runStdout);
+        // Pass the formatted input as stdin to the Python program
+        const pythonProcess = exec(`python3 ${filePath}`, (runErr, runStdout, runStderr) => {
+            if (runErr) {
+                return res.status(400).send(`Python Execution Error: ${runStderr}`);
+            }
+            res.send(runStdout);
 
-          fs.unlink(filePath, (unlinkErr) => {
-            if (unlinkErr) console.error("Error cleaning up file:", unlinkErr);
-          });
-        }
-      );
+            // Cleanup temporary file
+            fs.unlink(filePath, (unlinkErr) => {
+                if (unlinkErr) console.error("Error cleaning up file:", unlinkErr);
+            });
+        });
+
+        // Write the formatted input to the Python process's stdin
+        pythonProcess.stdin.write(formattedInput);
+        pythonProcess.stdin.end();
     });
-  } else if (language === "java") {
+}
+ else if (language === "java") {
     // const input = '10'; // Static input
     const fileName = "TempCode.java";
     const filePath = path.join(__dirname, "code_storage", fileName);
@@ -98,11 +114,7 @@ app.post("/compile", (req, res) => {
 
             // Run Java program with static input
             exec(
-              `echo ${input} | java -cp ${path.join(
-                __dirname,
-                "code_storage"
-              )} ${className}`,
-              (runErr, runStdout, runStderr) => {
+              `echo ${formattedInput} | java -cp ${path.join( __dirname, "code_storage")} ${className}`,(runErr, runStdout, runStderr) => {
                 if (runErr) {
                   return res
                     .status(400)
@@ -154,7 +166,7 @@ app.post("/compile", (req, res) => {
 
           // Run compiled C program with static input
           exec(
-            `echo ${input} | ${outputFilePath}`,
+            `echo ${formattedInput} | ${outputFilePath}`,
             (runErr, runStdout, runStderr) => {
               if (runErr) {
                 return res.status(400).send(`C Execution Error: ${runStderr}`);
@@ -199,7 +211,7 @@ app.post("/compile", (req, res) => {
 
           // Run compiled C++ program with static input
           exec(
-            `echo ${input} | ${outputFilePath}`,
+            `echo ${formattedInput} | ${outputFilePath}`,
             (runErr, runStdout, runStderr) => {
               if (runErr) {
                 return res
