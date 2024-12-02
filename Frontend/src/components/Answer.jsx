@@ -14,10 +14,11 @@ import { setCodes, updateCode, updateOutput } from "../redux/codeSlice";
 import { CircleChevronDown } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// Icon display function
+
 const OutputIcon = () => {
   return <FaCheckCircle style={{ color: "green", marginLeft: "5px" }} />;
 };
+
 const Answer = ({
   currentIndex,
   code,
@@ -27,11 +28,11 @@ const Answer = ({
   questionLanguage,
   setShowOutput,
   showOutput,
+  restartTimer,
 }) => {
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
   const [theme, setTheme] = useState("vs-dark");
-  //const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [expectedOutput, setExpectedOutput] = useState("5,10,15");
   const [outputs, setOutputs] = useState([]);
@@ -42,6 +43,7 @@ const Answer = ({
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
+  const [timer, setTimer] = useState(0); // Timer state
   const prefilledCode = `//your prefilled code example here
   console.log('hello world')`;
   const languagesArray = [
@@ -51,8 +53,6 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
-  //const input ="5\n10\n20";
- 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const testId = searchParams.get("testId");
@@ -60,6 +60,16 @@ const Answer = ({
     questionLanguage === "any"
       ? languagesArray
       : languagesArray.filter((lang) => lang.value === questionLanguage);
+
+  
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer((prev) => prev + 1); // Increment timer every second
+    }, 1000);
+
+    return () => clearInterval(interval); // Clear interval on unmount
+  }, []);
 
   useEffect(() => {
     const storedCode =
@@ -91,7 +101,6 @@ const Answer = ({
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
-    occurrencesHighlight: "off";
     localStorage.setItem(`code_${currentIndex}`, newCode);
     dispatch(
       updateCode({
@@ -101,10 +110,12 @@ const Answer = ({
       })
     );
   };
+
   const disableRightClick = (event) => {
     event.preventDefault();
     alert("Right-click is disabled.");
   };
+
   const disableDragDrop = (event) => {
     event.preventDefault();
     alert("Drag-and-drop functionality is disabled.");
@@ -115,83 +126,48 @@ const Answer = ({
     alert("Copy-Paste functionality is disabled.");
   };
 
-  useEffect(() => {
-    const handleClipboardEvent = (e) => {
-      e.preventDefault();
-      alert(`Clipboard action (${e.type}) is disabled`);
-    };
-
-    document.addEventListener("copy", handleClipboardEvent);
-    document.addEventListener("cut", handleClipboardEvent);
-    document.addEventListener("paste", handleClipboardEvent);
-    document.addEventListener("contextmenu", disableRightClick);
-    document.addEventListener("dragstart", disableDragDrop);
-    document.addEventListener("dragover", disableDragDrop);
-    document.addEventListener("drop", disableDragDrop);
-
-    return () => {
-      document.removeEventListener("copy", handleClipboardEvent);
-      document.removeEventListener("cut", handleClipboardEvent);
-      document.removeEventListener("paste", handleClipboardEvent);
-      document.removeEventListener("contextmenu", disableRightClick);
-      document.removeEventListener("dragstart", disableDragDrop);
-      document.removeEventListener("dragover", disableDragDrop);
-      document.removeEventListener("drop", disableDragDrop);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey)
-      ) {
-        e.preventDefault();
-        alert("Clipboard actions (copy, cut, paste) are disabled");
-      }
-
-      if (e.key === "Insert" || (e.key === "Delete" && e.shiftKey)) {
-        e.preventDefault();
-        alert("Alternative clipboard actions are disabled");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   const compileCode = async () => {
+    const blacklistedWords = ["function", "while"]; // blackword declartion
+    const whitelistedWords = ["print", "sum"]; // whiteword declaration
+  
+    // Function to check if a blacklisted word is inside a print statement
+    const isBlackwordInPrintStatement = (content, blackWord) => {
+      const regex = new RegExp(
+        `(?:console\\.log|print|printf|System\\.out\\.println)\\s*\\(.*?\\b${blackWord}\\b.*?\\)`,
+        "g"
+      );
+      return regex.test(content);
+    };
+  
+    // Check for blacklisted words not in print statements
+    const hasBlacklistedWordsOutsidePrint = blacklistedWords.some((blackWord) => {
+      const isInsidePrint = isBlackwordInPrintStatement(editorContent, blackWord);
+      return editorContent.includes(blackWord) && !isInsidePrint;
+    });
+  
+    // Check for presence of whitelisted words
+    const hasWhitelistedWords = whitelistedWords.some((whiteWord) =>
+      editorContent.includes(whiteWord)
+    );
+  
+    if (hasBlacklistedWordsOutsidePrint) {
+      alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}}`);
+      return;
+    }
+    
+  
+    if (!hasWhitelistedWords) {
+      alert("Error: Code does not contain any required whitelisted words.");
+      return;
+    }
+  
+    // If validation passes, proceed with compilation
     setShowDifference(false);
     setShowOutput(true);
-    console.log("input:",customInput)
     dispatch(updateOutput({ index: currentIndex, output: "Compiling..." }));
     setCompilationMessage("");
-    //const input = [5, 10, 20];
-    const input="5\n10\n20"
-    // const inputToSend = useCustomInput
-    // ? customInput.split(/[\n\s]+/).filter((line) => line.trim() !== "")
-    // : input.split(/[\n\s]+/).filter((line) => line.trim() !== "");
-
-    const inputToSend = useCustomInput
-  ? customInput.split("\n").map((line) => line.trim())
-  :  input.split("\n").map(item => item.trim()); // Already an array
-
-  // const inputToSend = useCustomInput
-  // ? customInput
-  //     .split(/\r?\n/) // This will correctly split on both \n and \r\n line breaks
-  //     .map((line) => line.trim()) // Trim each line to avoid extra spaces
-  //     .filter((line) => line !== "") // Remove empty lines
-  // : input
-  //     .split(/\r?\n/)
-  //     .map((line) => line.trim())
-  //     .filter((line) => line !== "");
-
-
-    //const inputToSend = customInput ? customInput : input;
-    console.log(inputToSend);
+    const inputToSend = customInput ? customInput : input;
+  
     try {
       const response = await fetch("http://localhost:3000/compile", {
         method: "POST",
@@ -202,7 +178,7 @@ const Answer = ({
           input: inputToSend,
         }),
       });
-
+  
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(errorMessage);
@@ -214,10 +190,14 @@ const Answer = ({
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };
-
+  
   const handleSubmit = () => {
+    setTimer(0); // Reset timer when clicking Submit
     const marks = Math.floor(Math.random() * 100);
     const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
+
+    restartTimer();
+    setShowOutput(true); // Example logic to show output on submission
 
     const submission = {
       marksObtained: marks,
@@ -233,7 +213,7 @@ const Answer = ({
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
 
-    navigate(`/finishattempt?testId=${testId}`);
+    navigate(`/review?testId=${testId}`);
   };
 
   const showDifferences = () => {
@@ -440,6 +420,7 @@ bg-gray-800 text-white"
         </div>
       )}
     </div>
+
   );
 };
 
