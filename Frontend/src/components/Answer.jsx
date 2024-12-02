@@ -51,7 +51,8 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
-  const input = 10;
+  //const input ="5\n10\n20";
+ 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const testId = searchParams.get("testId");
@@ -165,9 +166,31 @@ const Answer = ({
   const compileCode = async () => {
     setShowDifference(false);
     setShowOutput(true);
+    console.log("input:",customInput)
     dispatch(updateOutput({ index: currentIndex, output: "Compiling..." }));
     setCompilationMessage("");
-    const inputToSend = customInput ? customInput : input;
+    //const input = [5, 10, 20];
+    const input="5\n10\n20"
+    // const inputToSend = useCustomInput
+    // ? customInput.split(/[\n\s]+/).filter((line) => line.trim() !== "")
+    // : input.split(/[\n\s]+/).filter((line) => line.trim() !== "");
+
+    const inputToSend = useCustomInput
+  ? customInput.split("\n").map((line) => line.trim())
+  :  input.split("\n").map(item => item.trim()); // Already an array
+
+  // const inputToSend = useCustomInput
+  // ? customInput
+  //     .split(/\r?\n/) // This will correctly split on both \n and \r\n line breaks
+  //     .map((line) => line.trim()) // Trim each line to avoid extra spaces
+  //     .filter((line) => line !== "") // Remove empty lines
+  // : input
+  //     .split(/\r?\n/)
+  //     .map((line) => line.trim())
+  //     .filter((line) => line !== "");
+
+
+    //const inputToSend = customInput ? customInput : input;
     console.log(inputToSend);
     try {
       const response = await fetch("http://localhost:3000/compile", {
