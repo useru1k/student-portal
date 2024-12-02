@@ -11,13 +11,14 @@ import Modules from './Modules';
 import TestAttempt from './TestAttempt';
 import Editor from './Editor';
 import Review from './Review';
+import FinishAttempt from './FinishAttempt';
 
 const Dashboard = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(true);
   const location = useLocation();
 
   // Define paths for routes that should hide TopNav and SideNav
-  const SPECIAL_ROUTES = ['/editor', '/review'];
+  const SPECIAL_ROUTES = ['/editor', '/review', '/finishattempt'];
   const isSpecialRoute = SPECIAL_ROUTES.some(route => location.pathname.startsWith(route));
 
   const toggleSideNav = () => {
@@ -56,6 +57,7 @@ const Dashboard = () => {
           <Routes>
             <Route path="editor" element={<Editor />} />
             <Route path="review" element={<Review />} />
+            <Route path="finishattempt" element={<FinishAttempt />} />
           </Routes>
         </div>
       )}

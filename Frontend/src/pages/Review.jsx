@@ -22,12 +22,8 @@ const Review = () => {
 
   const submission = submissions[0];
 
-  const handleFinalSubmit = () => {
-    window.close();
-  };
-
   const handleClose = () => {
-    window.close();
+    window.close(); 
   };
 
   return (
@@ -89,22 +85,15 @@ const Review = () => {
           </div>
 
           <div className="mt-8 flex justify-center pb-4">
-            {fromEditor ? (
-              <button
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition duration-200"
-                onClick={handleFinalSubmit}
-              >
-                Submit and Close
-              </button>
-            ) : (
-              <button
-                className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition duration-200"
-                onClick={handleClose}
-              >
-                Close
-              </button>
-            )}
-          </div>
+  
+    <button
+      className="mt-4 px-4 py-2 bg-gray-500 text-white rounded"
+      onClick={handleClose}
+    >
+      Close
+    </button>
+
+</div>
         </div>
       </div>
     </div>
