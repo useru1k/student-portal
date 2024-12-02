@@ -233,7 +233,7 @@ const Answer = ({
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
 
-    navigate(`/review?testId=${testId}`);
+    navigate(`/finishattempt?testId=${testId}`);
   };
 
   const showDifferences = () => {
