@@ -3,46 +3,28 @@ import React from 'react';
 const A_ResourceCard = ({ title, current, alert, threshold }) => {
   return (
     <div
-      style={{
-        padding: '20px',
-        background: '#1E272E',
-        color: '#fff',
-        marginBottom: '20px',
-        borderRadius: '12px',
-        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
-        maxWidth: '1500px',
-        border: '3px solid',
-        borderImage: 'linear-gradient(to right, #4CAF50, #8BC34A) 1',
-        textAlign: 'center',
-        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.transform = 'scale(1.02)';
-        e.target.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.4)';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.transform = 'scale(1)';
-        e.target.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.3)';
-      }}
+    className="p-5 bg-gray-800 text-white mb-5 rounded-md shadow-lg max-w-screen-lg border-4 border-transparent border-gradient-to-r from-green-500 to-green-300 text-center"
     >
-      <h3 style={{ marginBottom: '15px', fontWeight: 'bold', color: '#A4E656' }}>{title}</h3>
-      <p style={{ fontSize: '18px', margin: '10px 0' }}>
-        <strong>Current:</strong>{' '}
-        {current !== null ? (
-          <span style={{ color: alert ? '#FF6F61' : '#C8E6C9' }}>{`${current}%`}</span>
-        ) : (
-          'Loading...'
-        )}
-      </p>
-      <p style={{ fontSize: '18px', margin: '10px 0' }}>
-        <strong>Alert:</strong>{' '}
-        <span style={{ color: alert ? '#FF6F61' : '#C8E6C9' }}>{alert ? 'Yes' : 'No'}</span>
-      </p>
-      <p style={{ fontSize: '18px', margin: '10px 0' }}>
-        <strong>Threshold:</strong> {threshold}%
-      </p>
+    <h3 className="mb-4 font-bold text-green-300 text-lg">{title}</h3>
+    <p className="text-lg my-2">
+    <strong>Current:</strong>{' '}
+    {current !== null ? (
+      <span className={alert ? 'text-red-400' : 'text-green-200'}>{`${current}%`}</span>
+    ) : (
+      'Loading...'
+    )}
+    </p>
+    <p className="text-lg my-2">
+    <strong>Alert:</strong>{' '}
+    <span className={alert ? 'text-red-400' : 'text-green-200'}>{alert ? 'Yes' : 'No'}</span>
+    </p>
+    <p className="text-lg my-2">
+    <strong>Threshold:</strong> {threshold}%
+    </p>
     </div>
   );
 };
 
 export default A_ResourceCard;
+
+// transition-transform duration-200 transform hover:scale-105 hover:shadow-2xl -- Hover Effect --
