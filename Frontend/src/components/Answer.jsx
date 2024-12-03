@@ -1,24 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import {
-  FaPlay,
-  FaSun,
-  FaMoon,
-  FaCode,
-  FaPaperPlane,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaPlay, FaSun, FaMoon, FaCode, FaPaperPlane, FaCheckCircle } from "react-icons/fa";
 import "../assets/css/Answer.css";
+import { CircleChevronDown } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
-import { setCodes, updateCode, updateOutput } from "../redux/codeSlice";
-import { CircleChevronDown } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { setCodes, updateCode,updateOutput} from "../redux/codeSlice";
+import { useSearchParams} from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+// Icon display function
 const OutputIcon = () => {
   return <FaCheckCircle style={{ color: "green", marginLeft: "5px" }} />;
 };
-
 const Answer = ({
   currentIndex,
   code,
@@ -32,6 +24,7 @@ const Answer = ({
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
   const [theme, setTheme] = useState("vs-dark");
+  //const [showOutput, setShowOutput] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [expectedOutput, setExpectedOutput] = useState("5,10,15");
   const [outputs, setOutputs] = useState([]);
@@ -42,9 +35,8 @@ const Answer = ({
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-  const [timer, setTimer] = useState(0); // Timer state
-  const prefilledCode = `//your prefilled code example here
-  console.log('hello world')`;
+  const prefilledCode=`//your prefilled code example here
+  console.log('hello world')`
   const languagesArray = [
     { value: "python", label: "Python" },
     { value: "cpp", label: "C++" },
@@ -52,27 +44,17 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
+  const input=10;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const testId = searchParams.get("testId");
+  const testId = searchParams.get('testId');
   const filteredLanguages =
     questionLanguage === "any"
       ? languagesArray
       : languagesArray.filter((lang) => lang.value === questionLanguage);
 
-  
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prev) => prev + 1); // Increment timer every second
-    }, 1000);
-
-    return () => clearInterval(interval); // Clear interval on unmount
-  }, []);
-
-  useEffect(() => {
-    const storedCode =
-      codes[currentIndex]?.code || localStorage.getItem(`code_${currentIndex}`);
+    const storedCode =codes[currentIndex]?.code|| localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
 
     const editorElement = editorRef.current?.container;
@@ -100,21 +82,15 @@ const Answer = ({
   const handleEditorChange = (newCode) => {
     setEditorContent(newCode);
     onCodeChange(newCode);
+    occurrencesHighlight: 'off';
     localStorage.setItem(`code_${currentIndex}`, newCode);
-    dispatch(
-      updateCode({
-        index: currentIndex,
-        code: newCode,
-        output: codes[currentIndex]?.output || "",
-      })
-    );
-  };
+    dispatch(updateCode({ index: currentIndex, code: newCode, output: codes[currentIndex]?.output || "" }));
 
+  };
   const disableRightClick = (event) => {
     event.preventDefault();
     alert("Right-click is disabled.");
   };
-
   const disableDragDrop = (event) => {
     event.preventDefault();
     alert("Drag-and-drop functionality is disabled.");
@@ -125,11 +101,59 @@ const Answer = ({
     alert("Copy-Paste functionality is disabled.");
   };
 
+  useEffect(() => {
+    const handleClipboardEvent = (e) => {
+      e.preventDefault();
+      alert(`Clipboard action (${e.type}) is disabled`);
+    };
+
+    document.addEventListener("copy", handleClipboardEvent);
+    document.addEventListener("cut", handleClipboardEvent);
+    document.addEventListener("paste", handleClipboardEvent);
+    document.addEventListener("contextmenu", disableRightClick);
+    document.addEventListener("dragstart", disableDragDrop);
+    document.addEventListener("dragover", disableDragDrop);
+    document.addEventListener("drop", disableDragDrop);
+
+    return () => {
+      document.removeEventListener("copy", handleClipboardEvent);
+      document.removeEventListener("cut", handleClipboardEvent);
+      document.removeEventListener("paste", handleClipboardEvent);
+      document.removeEventListener("contextmenu", disableRightClick);
+      document.removeEventListener("dragstart", disableDragDrop);
+      document.removeEventListener("dragover", disableDragDrop);
+      document.removeEventListener("drop", disableDragDrop);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey) 
+      ) {
+        e.preventDefault();
+        alert("Clipboard actions (copy, cut, paste) are disabled");
+      }
+      
+      if (e.key === "Insert" || (e.key === "Delete" && e.shiftKey)) {
+        e.preventDefault();
+        alert("Alternative clipboard actions are disabled");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const compileCode = async () => {
-    const blacklistedWords = ["function", "while"]; // blackword declartion
-    const whitelistedWords = ["print", "sum"]; // whiteword declaration
+    // Separate variables for blacklisted and whitelisted words
+    const blacklistedWords = ["function", "while"];
+    const whitelistedWords = ["print", "sum"];
   
-    // Function to check if a blacklisted word is inside a print statement
     const isBlackwordInPrintStatement = (content, blackWord) => {
       const regex = new RegExp(
         `(?:console\\.log|print|printf|System\\.out\\.println)\\s*\\(.*?\\b${blackWord}\\b.*?\\)`,
@@ -138,29 +162,41 @@ const Answer = ({
       return regex.test(content);
     };
   
-    // Check for blacklisted words not in print statements
-    const hasBlacklistedWordsOutsidePrint = blacklistedWords.some((blackWord) => {
-      const isInsidePrint = isBlackwordInPrintStatement(editorContent, blackWord);
-      return editorContent.includes(blackWord) && !isInsidePrint;
-    });
+    const hasBlacklistedWordsOutsidePrint = () => {
+      return blacklistedWords.some((blackWord) => {
+        const isInsidePrint = isBlackwordInPrintStatement(editorContent, blackWord);
+        return editorContent.includes(blackWord) && !isInsidePrint;
+      });
+    };
   
-    // Check for presence of whitelisted words
-    const hasWhitelistedWords = whitelistedWords.some((whiteWord) =>
-      editorContent.includes(whiteWord)
-    );
+    const hasAllWhitelistedWords = () => {
+      return whitelistedWords.every((whiteWord) => editorContent.includes(whiteWord));
+    };
   
-    if (hasBlacklistedWordsOutsidePrint) {
-      alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}}`);
+    const isCommandLineValid = () => {
+      // Ensure that all whitelisted words are not used in comments (e.g., starting with #)
+      return whitelistedWords.every((whiteWord) => {
+        const regex = new RegExp(`^(?!.*#.*\\b${whiteWord}\\b).*`, "gm"); // Match lines without whitelisted word in comments
+        return regex.test(editorContent);  // Ensure whitelisted word isn't part of a comment
+      });
+    };
+  
+    // Error handling logic
+    if (hasBlacklistedWordsOutsidePrint()) {
+      alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
       return;
     }
-    
   
-    if (!hasWhitelistedWords) {
-      alert("Error: Code does not contain any required whitelisted words.");
+    if (!hasAllWhitelistedWords()) {
+      alert(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
       return;
     }
   
-    // If validation passes, proceed with compilation
+    if (!isCommandLineValid()) {
+      alert(`Error: Whitelisted words must not appear in comments (e.g., #print, #sum).`);
+      return;
+    }
+  
     setShowDifference(false);
     setShowOutput(true);
     dispatch(updateOutput({ index: currentIndex, output: "Compiling..." }));
@@ -171,11 +207,7 @@ const Answer = ({
       const response = await fetch("http://localhost:3000/compile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: editorContent,
-          language,
-          input: inputToSend,
-        }),
+        body: JSON.stringify({ code: editorContent, language, input: inputToSend }),
       });
   
       if (!response.ok) {
@@ -190,14 +222,11 @@ const Answer = ({
     }
   };
   
+   
   const handleSubmit = () => {
-    setTimer(0); // Reset timer when clicking Submit
     const marks = Math.floor(Math.random() * 100);
     const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
-
-//     restartTimer();
-    setShowOutput(true); // Example logic to show output on submission
-
+   
     const submission = {
       marksObtained: marks,
       submissionDate: new Date().toLocaleString(),
@@ -206,11 +235,11 @@ const Answer = ({
       feedback: "Good job!",
       status: status,
     };
-
-    const submissions =
-      JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
+ 
+    const submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
+ 
 
     navigate(`/finishattempt?testId=${testId}`);
   };
@@ -218,13 +247,13 @@ const Answer = ({
   const showDifferences = () => {
     if (!showDifference) {
       const highlighted = [];
-      const gotOutput = codes[currentIndex]?.output || "";
+      const gotOutput = codes[currentIndex]?.output || ""; 
       const maxLength = Math.max(expectedOutput.length, gotOutput.length);
 
       for (let i = 0; i < maxLength; i++) {
         if (expectedOutput[i] !== gotOutput[i]) {
           highlighted.push(
-            <span key={i} style={{ backgroundColor: "yellow", color: "black" }}>
+            <span key={i} style={{ backgroundColor: "yellow", color:"black" }}>
               {gotOutput[i] || " "}
             </span>
           );
@@ -258,7 +287,7 @@ const Answer = ({
             {showPrefilledCode ? "Hide Prefilled Code" : "Show Prefilled Code"}
           </span>
         </button>
-        <button
+            <button
           className="btn-run bg-green-500 text-white py-1 px-2 rounded-md flex items-center space-x-1 text-sm"
           onClick={compileCode}
         >
@@ -319,6 +348,7 @@ bg-gray-800 text-white"
       </div>
       {showPrefilledCode && (
         <div className="prefilled-code-section border border-gray-300 rounded-md p-2 bg-gray-900 text-white">
+         
           <pre
             className="whitespace-pre-wrap
 
@@ -333,15 +363,16 @@ bg-gray-800 text-white"
       {/* Output section */}
       {showOutput && (
         <div className="output-section border border-gray-300 rounded-lg shadow-md bg-gray-800 p-4 h-[40%] sm:h-[300px] overflow-y-auto">
-          <div className="flex flex-roe justify-end items-end">
-            <button
-              className="btn-output-toggle py-1 px-2 rounded-md flex justify-end items-end space-x-1 text-sm"
-              onClick={() => setShowOutput((prev) => !prev)}
-            >
-              <CircleChevronDown />
-            </button>
-          </div>
+             <div className="flex flex-roe justify-end items-end">
+              <button
+    className="btn-output-toggle py-1 px-2 rounded-md flex justify-end items-end space-x-1 text-sm"
+    onClick={() => setShowOutput((prev) => !prev)}
+  >
+    <CircleChevronDown/>
+  </button>
+  </div>
 
+ 
           <table className="w-full table-fixed">
             <thead>
               <tr className="text-gray-300">
@@ -354,41 +385,39 @@ bg-gray-800 text-white"
               <tr>
                 <td className="p-2 border border-gray-600">
                   <textarea
-                    value={"10"}
+                    value={"1,2,3"}
                     readOnly
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
-                    style={{ display: "flex", height: "80px", width: "100%" }}
+                    style={{ display:"flex", height: "80px", width: "100%" }}
                   />
                 </td>
                 <td className="p-2 border border-gray-600">
                   <textarea
-                    value={expectedOutput}
+                   value={expectedOutput}
                     readOnly
                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
-                    style={{ display: "flex", height: "80px", width: "100%" }}
+                    style={{ display:"flex", height: "80px", width: "100%" }}
                   />
                 </td>
                 <td className="p-2 border border-gray-600">
                   {showDifference ? (
                     <div
-                      className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
-                      style={{
-                        position: "sticky",
-                        height: "80px",
-                        width: "100%",
-                        overflowY: "auto",
-                      }}
+                    className="highlighted-output w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
+                    style={{ position:"sticky",height: "80px", width: "100%", overflowY: "auto" }}
                     >
                       {highlightedOutput}
+                     
                     </div>
                   ) : (
                     <textarea
-                      value={codes[currentIndex]?.output}
+                      value={codes[currentIndex]?.output} 
+                     
                       readOnly
                       className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md resize-none"
-                      style={{ display: "flex", height: "80px", width: "100%" }}
+                      style={{display:"flex", height: "80px", width: "100%" }}
                     />
                   )}
+
                 </td>
               </tr>
             </tbody>
@@ -399,11 +428,11 @@ bg-gray-800 text-white"
               onClick={showDifferences}
             >
               {showDifference ? "Hide Differences" : "Show Differences"}
+              
             </button>
             <button
               className="toggle-input bg-gray-700 text-white py-1 px-4 rounded-md"
               onClick={() => setUseCustomInput((prev) => !prev)}
-              onBlur={() => setCustomInput("")}
             >
               {useCustomInput ? "Hide Custom Input" : "Custom Input"}
             </button>
@@ -419,7 +448,6 @@ bg-gray-800 text-white"
         </div>
       )}
     </div>
-
   );
 };
 
