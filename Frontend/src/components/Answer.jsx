@@ -28,7 +28,6 @@ const Answer = ({
   questionLanguage,
   setShowOutput,
   showOutput,
-  restartTimer,
 }) => {
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
@@ -196,7 +195,7 @@ const Answer = ({
     const marks = Math.floor(Math.random() * 100);
     const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
 
-    restartTimer();
+//     restartTimer();
     setShowOutput(true); // Example logic to show output on submission
 
     const submission = {
@@ -213,7 +212,7 @@ const Answer = ({
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
 
-    navigate(`/review?testId=${testId}`);
+    navigate(`/finishattempt?testId=${testId}`);
   };
 
   const showDifferences = () => {
