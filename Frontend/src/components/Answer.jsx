@@ -176,40 +176,55 @@ const Answer = ({
 
 
   const compileCode = async () => {
-    // const blacklistedWords = ["function", "while"]; // blackword declartion
-    // const whitelistedWords = ["print", "sum"]; // whiteword declaration
+     const blacklistedWords = ["function", "while"]; // blackword declartion
+    const whitelistedWords = ["print", "sum"]; // whiteword declaration
   
-    // // Function to check if a blacklisted word is inside a print statement
-    // const isBlackwordInPrintStatement = (content, blackWord) => {
-    //   const regex = new RegExp(
-    //     `(?:console\\.log|print|printf|System\\.out\\.println)\\s*\\(.*?\\b${blackWord}\\b.*?\\)`,
-    //     "g"
-    //   );
-    //   return regex.test(content);
-    // };
+    // Function to check if a blacklisted word is inside a print statement
+     const isBlackwordInPrintStatement = (content, blackWord) => {
+     const regex = new RegExp(
+        `(?:console\\.log|print|printf|System\\.out\\.println)\\s*\\(.*?\\b${blackWord}\\b.*?\\)`,
+         "g"
+       );
+       return regex.test(content);
+     };
   
-    // // Check for blacklisted words not in print statements
-    // const hasBlacklistedWordsOutsidePrint = blacklistedWords.some((blackWord) => {
-    //   const isInsidePrint = isBlackwordInPrintStatement(editorContent, blackWord);
-    //   return editorContent.includes(blackWord) && !isInsidePrint;
-    // });
-  
-    // // Check for presence of whitelisted words
-    // const hasWhitelistedWords = whitelistedWords.some((whiteWord) =>
-    //   editorContent.includes(whiteWord)
-    // );
-  
-    // if (hasBlacklistedWordsOutsidePrint) {
-    //   alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}}`);
-    //   return;
-    // }
+     const hasBlacklistedWordsOutsidePrint = () => {
+      return blacklistedWords.some((blackWord) => {
+        const regex = new RegExp(`\\b${blackWord}\\b`); // Match exact word using word boundaries
+        const isInsidePrint = isBlackwordInPrintStatement(editorContent, blackWord);
+        return regex.test(editorContent) && !isInsidePrint;
+      });
+    };
     
   
-    // if (!hasWhitelistedWords) {
-    //   alert("Error: Code does not contain any required whitelisted words.");
-    //   return;
-    // }
+    const hasAllWhitelistedWords = () => {
+      return whitelistedWords.every((whiteWord) => editorContent.includes(whiteWord));
+    };
   
+  
+    const isCommandLineValid = () => {
+      // Ensure that all whitelisted words are not used in comments (e.g., starting with #)
+      return whitelistedWords.every((whiteWord) => {
+        const regex = new RegExp(`^(?!.*#.*\\b${whiteWord}\\b).*`, "gm"); // Match lines without whitelisted word in comments
+        return regex.test(editorContent);  // Ensure whitelisted word isn't part of a comment
+      });
+    };
+    
+  
+    if (hasBlacklistedWordsOutsidePrint()) {
+      alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
+      return;
+    }
+  
+    if (!hasAllWhitelistedWords()) {
+      alert(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
+      return;
+    }
+  
+    if (!isCommandLineValid()) {
+      alert(`Error: Whitelisted words are not accepted where used in command-line`);
+      return;
+    }
     // If validation passes, proceed with compilation
     setShowDifference(false);
     setShowOutput(true);
@@ -283,7 +298,7 @@ const Answer = ({
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
 
-    navigate(`/review?testId=${testId}`);
+    navigate(`/finishattempt?testId=${testId}`);
   };
 
   const showDifferences = () => {
