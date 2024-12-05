@@ -58,9 +58,8 @@ const TestAttempt = () => {
   }
 };
 
-
   return (
-    <div className=" bg-gray-100 overflow-y-auto rounded-sm">
+    <div className=" bg-gray-100 h-[85vh] overflow-y-auto rounded-sm">
       {/* Main Content Container */}
       <div className="bg-gray-100 container mx-auto p-2 sm:p-4 md:p-6 max-w-7xl">
         {/* Header Card */}
