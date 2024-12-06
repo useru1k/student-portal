@@ -1,20 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-
 import Question1 from './Question1';
 import Question2 from './Question2';
 
 const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSignal }) => {
-  const initialTimers = [60, 60]; // Initial time for each question in seconds
-
+  const initialTimers = [60, 60];
   const [timers, setTimers] = useState(() => {
-    // Initialize timers only from localStorage specific for timers
     const savedTimers = JSON.parse(localStorage.getItem('questionTimers'));
     return savedTimers || initialTimers;
   });
-
-  const [availableQuestions, setAvailableQuestions] = useState([0, 1]); // Track non-expired questions
+  const [availableQuestions, setAvailableQuestions] = useState([0, 1]);
   const timerRef = useRef(null);
 
   const questions = [<Question1 key={0} />, <Question2 key={1} />];
@@ -38,21 +33,19 @@ const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSi
     if (restartSignal) {
       clearInterval(timerRef.current);
       setTimers(initialTimers);
-      localStorage.removeItem('questionTimers'); // Reset only the timers
-      localStorage.removeItem('currentIndex'); // Reset currentIndex
-      localStorage.removeItem('availableQuestions'); // Reset question availability
+      localStorage.removeItem('questionTimers');
+      localStorage.removeItem('currentIndex');
+      localStorage.removeItem('availableQuestions');
       setAvailableQuestions([0, 1]);
     }
   }, [restartSignal]);
 
   useEffect(() => {
-    // Save non-timer data to localStorage
     localStorage.setItem('currentIndex', JSON.stringify(currentIndex));
     localStorage.setItem('availableQuestions', JSON.stringify(availableQuestions));
   }, [currentIndex, availableQuestions]);
 
   useEffect(() => {
-    // Save only timer data to its dedicated localStorage key
     localStorage.setItem('questionTimers', JSON.stringify(timers));
   }, [timers]);
 
@@ -85,14 +78,13 @@ const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSi
       setAvailableQuestions(remainingQuestions);
 
       if (!remainingQuestions.includes(currentIndex) && remainingQuestions.length > 0) {
-        setCurrentIndex(remainingQuestions[0]); // Navigate to the next available question
+        setCurrentIndex(remainingQuestions[0]);
       }
     }
 
     if (remainingQuestions.length === 0) {
       alert('All questions have expired!');
-      localStorage.removeItem('questionTimers'); // Only clear timer data
-      // Do not clear unrelated data
+      localStorage.removeItem('questionTimers');
       window.close();
     }
   }, [timers, availableQuestions, currentIndex, setCurrentIndex]);
@@ -110,11 +102,17 @@ const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSi
   };
 
   return (
+    <div className="relative  w-full h-[90vh] overflow-hidden  bg-gradient-to-r from-[#2b2e33] to-[#1c1e22] flex flex-col items-start justify-start font-inter mx-1">
     <div
-      className="relative p-4 w-full h-[88vh] overflow-hidden rounded-xl bg-gradient-to-r from-[#2b2e33] to-[#1c1e22] flex flex-col items-start justify-start font-inter mx-0"
-      style={{ fontFamily: 'Inter, sans-serif' }}
-    >
-      <div className="absolute flex flex-col justify-start text-white z-[1] rounded-md inset-0.5 bg-[#282c34] bg-opacity-80 backdrop-blur-md w-full h-full overflow-y-auto pt-3 px-4 sm:px-6 pb-12">
+  className="absolute flex flex-col justify-start text-white z-[1] rounded-md inset-0.5 
+  bg-[#282c34] bg-opacity-80 backdrop-blur-md w-full h-full overflow-y-auto pt-3 px-4 pb-12 sm:px-6 
+  [&::-webkit-scrollbar]:w-2 
+   [&::-webkit-scrollbar]:h-2
+  [&::-webkit-scrollbar-track]:rounded-full 
+  [&::-webkit-scrollbar-track]:bg-gray-800 
+  [&::-webkit-scrollbar-thumb]:rounded-full 
+  [&::-webkit-scrollbar-thumb]:bg-gray-600"
+>
         <div className="w-full">
           <div className="flex justify-between mb-4 items-start">
             <div
@@ -129,7 +127,7 @@ const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSi
             </div>
           </div>
 
-          <div className="question-content mb-2 w-full text-xs md:text-sm leading-relaxed text-left">
+          <div className="mb-2 w-full text-xs md:text-sm leading-relaxed text-left">
             {questions[currentIndex]}
           </div>
         </div>

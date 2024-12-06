@@ -28,7 +28,7 @@ const Answer = ({
   questionLanguage,
   setShowOutput,
   showOutput,
-  restartTimer,
+  // restartTimer,
 }) => {
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
@@ -324,7 +324,7 @@ const Answer = ({
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col rounded-lg space-y-4 h-full lg:h-[98%]">
+    <div className="container mx-auto  flex flex-col  space-y-4 h-full lg:h-[98%]">
       {/* Top bar with theme toggle, language dropdown, etc. */}
       <div className="top-bar mb-1 flex flex-wrap gap-2 justify-between items-center">
         <button
