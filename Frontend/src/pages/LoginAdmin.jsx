@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaUserGraduate } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
@@ -8,75 +8,258 @@ const LoginAdmin = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
-    // Simulate user authentication (replace with your actual authentication logic)
-    const isValidUser = await authenticateUser(username, password); // Assume this function returns a user object or null
+    const isValidUser = await authenticateUser(username, password);
 
     if (isValidUser) {
-      localStorage.setItem('authToken', isValidUser.token); // Store token in localStorage if returned
-      onLogin(isValidUser.role); // Pass the role (admin/user)
-      navigate(isValidUser.role === 'admin' ? "/adashboard" : "/dashboard"); // Navigate to the appropriate dashboard
+      localStorage.setItem("authToken", isValidUser.token);
+      onLogin(isValidUser.role);
+      navigate(isValidUser.role === "admin" ? "/adashboard" : "/dashboard");
     } else {
       setErrorMessage("Invalid username or password");
     }
   };
 
-
-  // Simulated authentication function
   const authenticateUser = async (username, password) => {
     const validCredentials = {
       admin: "admin123",
       user: "user123",
     };
-    
+
     if (validCredentials[username] === password) {
-      return { role: username }; // Return the role if valid
+      return { role: username };
     }
-    return null; // Return null for invalid credentials
+    return null;
   };
 
   return (
-    <div className="flex items-center justify-center h-screen loginbg bg-fixed bg-cover bg-center overflow-hidden">
-      <div className="relative w-[500px] h-[500px] glass border border-gray-300 rounded-xl shadow-xl flex items-center overflow-hidden">
-        <div className="min-w-full p-10 h-full">
-          <form onSubmit={handleLogin}>
-            <h1 className="text-3xl text-center mb-6 text-gray-800 font-bold hover:scale-105 transition-transform">Login</h1>
+    <div>
+      <div>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login Page</title>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              @import url('https://fonts.googleapis.com/css2?family=Plush+Variable+Roman:wght@100..900&display=swap');
+              
+              html, body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+              }
 
-            <div className="relative w-full h-[50px] mb-8">
-              <label htmlFor="username" className="sr-only">Username</label>
-              <input
-                id="username"
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full h-full bg-gray-100 border-2 border-gray-300 outline-none rounded-full text-gray-800 px-5 pl-5 pr-12 placeholder-gray-500 transition-all duration-300 hover:border-gray-700 focus:border-gray-700 focus:ring"
-              />
-              <FaUserGraduate className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-800" />
+              body {
+                font-family: Arial, sans-serif;
+              }
+
+              .wrapper {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, rgba(2, 0, 0.6) -20%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%);
+                margin: 0;
+                padding: 0;
+                z-index: -1;
+                border: none;
+                border-radius: 0px;
+              }
+
+              .box div {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                background-color: transparent;
+                border: 6px solid rgba(255, 255, 255, 0.8);
+              }
+              .box div:nth-child(1) { top: 12%; left: 42%; animation: animate 10s linear infinite; }
+              .box div:nth-child(2) { top: 70%; left: 50%; animation: animate 7s linear infinite; }
+              .box div:nth-child(3) { top: 17%; left: 6%; animation: animate 9s linear infinite; }
+              .box div:nth-child(4) { top: 20%; left: 60%; animation: animate 10s linear infinite; }
+              .box div:nth-child(5) { top: 67%; left: 10%; animation: animate 6s linear infinite; }
+              .box div:nth-child(6) { top: 80%; left: 70%; animation: animate 12s linear infinite; }
+              .box div:nth-child(7) { top: 60%; left: 80%; animation: animate 15s linear infinite; }
+              .box div:nth-child(8) { top: 32%; left: 25%; animation: animate 16s linear infinite; }
+              .box div:nth-child(9) { top: 90%; left: 25%; animation: animate 9s linear infinite; }
+              .box div:nth-child(10) { top: 20%; left: 80%; animation: animate 5s linear infinite; }
+              @keyframes animate {
+                0% {
+                  transform: scale(0) translateY(0) rotate(0);
+                  opacity: 1;
+                }
+                100% {
+                  transform: scale(1.3) translateY(-90px) rotate(360deg);
+                  opacity: 0;
+                }
+              }
+
+              .login-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                position: relative;
+                z-index: 10;
+              }
+
+              .glass {
+                background: rgba(255, 255, 255, 0);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                width: 600px;
+                height: 450px;
+                border-radius: 15px;
+                border-color: rgba(255, 255, 255,0.2);
+                position: relative;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+              }
+
+              .login-form {
+                width: 90%;
+                max-width: 520px;
+                text-align: center;
+                padding: 24px;
+                margin-top: -40px; /* Slight uplift */
+              }
+
+              .login-form h1 {
+                font-family: 'Plush Variable Roman', serif;
+                font-size: 45px;
+                font-weight: 800;
+                margin-bottom: 20px;
+                color: white;
+              }
+
+              .input-group {
+                margin-bottom: 16px;
+                position: relative;
+              }
+
+              .input-group input {
+                width: 100%;
+                height: 50px;
+                padding: 12px;
+                padding-right: 40px;
+                border-radius: 25px;
+                border: 2px solid #ccc;
+                outline: none;
+                font-size: 16px;
+                background-color: rgba(255,255,255,0.9);
+                transition: border-color 0.3s;
+              }
+
+              .input-group input:focus {
+                border-color: #007bff;
+              }
+
+              .input-group svg {
+                position: absolute;
+                top: 50%;
+                right: 16px;
+                transform: translateY(-50%);
+                color: #888;
+              }
+
+              .error-message {
+                color: red;
+                font-size: 14px;
+                margin-bottom: 16px;
+              }
+
+              .login-button {
+                width: 100%;
+                padding: 12px;
+                border-radius: 25px;
+                background: #007bff;
+                color: white;
+                font-size: 16px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.3s;
+              }
+
+              .login-button:hover {
+                background-color: #0056b3;
+              }
+
+              .forget-password {
+                color: white;
+                text-decoration: none;
+                position: absolute;
+                right: 24px;
+                bottom: 50px;
+                font-size: 14px;
+                font-weight: bold;
+              }
+
+              .forget-password:hover {
+                text-decoration: underline;
+                color: #ddd;
+              }
+            `,
+          }}
+        />
+        <div className="wrapper">
+          <div className="box">
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
+        </div>
+
+        <div className="login-container">
+          <div className="glass">
+            <div className="login-form">
+              <h1>SIET LMS</h1>
+              <form onSubmit={handleLogin}>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                  <FaUserGraduate />
+                </div>
+                <div className="input-group">
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <RiLockPasswordFill />
+                </div>
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
+                <button type="submit" className="login-button">
+                  Login
+                </button>
+              </form>
+              <a href="#" className="forget-password">Forget Password</a>
             </div>
-
-            <div className="relative w-full h-[50px] mb-8">
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full h-full bg-gray-100 border-2 border-gray-300 outline-none rounded-full text-gray-800 px-5 pl-5 pr-12 placeholder-gray-500 transition-all duration-300 hover:border-gray-700 focus:border-gray-700 focus:ring"
-              />
-              <RiLockPasswordFill className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-800" />
-            </div>
-
-            {errorMessage && <div className="text-red-600 text-center mb-4">{errorMessage}</div>}
-
-            <button type="submit" className="w-full h-[45px] bg-gray-700 text-white rounded-full font-semibold shadow-lg hover:bg-gray-500 transition-all duration-300 transform hover:scale-105">Login</button>
-          </form>
+          </div>
         </div>
       </div>
     </div>

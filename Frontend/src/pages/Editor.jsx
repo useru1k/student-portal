@@ -77,9 +77,9 @@ const Editor = () => {
   return (
     <>
       <Navbar streakCount={1} className="fixed top-0 left-0 w-full z-10" />
-      <div className="flex flex-col md:flex-row min-h-screen p-4 space-y-4 md:space-y-0 md:space-x-4 pt-[4rem] overflow-y-auto scroll-smooth">
+      <div className="flex flex-col md:flex-row min-h-screen   md:space-y-0 md:space-x-2 pt-[4rem] overflow-y-auto scroll-smooth">
         <div 
-          className={`w-full rounded-sm ${isAnswerVisible ? "hidden" : ""} md:block md:w-[45%] lg:w-[50%] xl:w-[34%] h-[50vh] md:h-[90vh] flex-shrink-0`}
+          className={`w-full rounded-sm ${isAnswerVisible ? "hidden" : ""} md:block md:w-[45%] lg:w-[50%] xl:w-[34%] h-[53vh] md:h-[90vh] flex-shrink-0`}
         >
           <Question
             currentIndex={currentIndex}
@@ -97,7 +97,7 @@ const Editor = () => {
           </button>
         </div>
         <div 
-          className={`w-full rounded-sm ${isAnswerVisible ? "" : "hidden"} md:block md:w-[55%] lg:w-[50%] xl:w-[65%] h-[80vh] md:h-[90vh] flex-shrink-0`}
+          className={`w-full rounded-sm ${isAnswerVisible ? "" : "hidden"} md:block md:w-[55%] lg:w-[50%] xl:w-[65%] h-[80vh] md:h-[92vh] flex-shrink-0`}
         >
           <Answer
             currentIndex={currentIndex}
