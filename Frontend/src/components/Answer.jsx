@@ -28,6 +28,9 @@ const Answer = ({
   questionLanguage,
   setShowOutput,
   showOutput,
+  showPopup,
+  handleSubmit,
+  setTimer
   // restartTimer,
 }) => {
   const dispatch = useDispatch();
@@ -43,7 +46,8 @@ const Answer = ({
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-  const [timer, setTimer] = useState(0); // Timer state
+  //const [timer, setTimer] = useState(0); // Timer state
+  const timers=localStorage.getItem('questionTimers')
   const prefilledCode = `//your prefilled code example here
   console.log('hello world')`;
   const languagesArray = [
@@ -53,15 +57,15 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const testId = searchParams.get("testId");
+  // const [searchParams] = useSearchParams();
+  // const navigate = useNavigate();                              
+  
   const filteredLanguages =
     questionLanguage === "any"
       ? languagesArray
       : languagesArray.filter((lang) => lang.value === questionLanguage);
 
-  
+      
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -71,11 +75,13 @@ const Answer = ({
     return () => clearInterval(interval); // Clear interval on unmount
   }, []);
 
+  
+  
   useEffect(() => {
     const storedCode =
       codes[currentIndex]?.code || localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
-
+    
     const editorElement = editorRef.current?.container;
     if (editorElement) {
       editorElement.addEventListener("copy", handleCopyPaste);
@@ -113,23 +119,23 @@ const Answer = ({
 
   const disableRightClick = (event) => {
     event.preventDefault();
-    alert("Right-click is disabled.");
+    showPopup("Right-click is disabled.");
   };
 
   const disableDragDrop = (event) => {
     event.preventDefault();
-    alert("Drag-and-drop functionality is disabled.");
+    showPopup("Drag-and-drop functionality is disabled.");
   };
 
   const handleCopyPaste = (event) => {
     event.preventDefault();
-    alert("Copy-Paste functionality is disabled.");
+    showPopup("Copy-Paste functionality is disabled.");
   };
 
   useEffect(() => {
     const handleClipboardEvent = (e) => {
       e.preventDefault();
-      alert(`Clipboard action (${e.type}) is disabled`);
+      showPopup(`Clipboard action (${e.type}) is disabled`);
     };
 
     document.addEventListener("copy", handleClipboardEvent);
@@ -158,12 +164,12 @@ const Answer = ({
         (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey)
       ) {
         e.preventDefault();
-        alert("Clipboard actions (copy, cut, paste) are disabled");
+        showPopup("Clipboard actions (copy, cut, paste) are disabled");
       }
 
       if (e.key === "Insert" || (e.key === "Delete" && e.shiftKey)) {
         e.preventDefault();
-        alert("Alternative clipboard actions are disabled");
+        showPopup("Alternative clipboard actions are disabled");
       }
     };
 
@@ -212,17 +218,17 @@ const Answer = ({
     
   
     if (hasBlacklistedWordsOutsidePrint()) {
-      alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
+      showPopup(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
       return;
     }
   
     if (!hasAllWhitelistedWords()) {
-      alert(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
+      showPopup(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
       return;
     }
   
     if (!isCommandLineValid()) {
-      alert(`Error: Whitelisted words are not accepted where used in command-line`);
+      showPopup(`Error: Whitelisted words are not accepted where used in command-line`);
       return;
     }
     // If validation passes, proceed with compilation
@@ -276,41 +282,17 @@ const Answer = ({
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };  
-  const handleSubmit = () => {
-    setTimer(0); // Reset timer when clicking Submit
-    const marks = Math.floor(Math.random() * 100);
-    const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
-
-    // restartTimer();
-    setShowOutput(true); // Example logic to show output on submission
-
-    const submission = {
-      marksObtained: marks,
-      submissionDate: new Date().toLocaleString(),
-      question: "Sample Question",
-      answer: "Sample Answer",
-      feedback: "Good job!",
-      status: status,
-    };
-
-    const submissions =
-      JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
-    submissions.push(submission);
-    localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
-
-    navigate(`/finishattempt?testId=${testId}`);
-  };
-
+ 
   const showDifferences = () => {
     if (!showDifference) {
       const highlighted = [];
-      const gotOutput = codes[currentIndex]?.output || "";
+      const gotOutput = codes[currentIndex]?.output || ""; 
       const maxLength = Math.max(expectedOutput.length, gotOutput.length);
 
       for (let i = 0; i < maxLength; i++) {
         if (expectedOutput[i] !== gotOutput[i]) {
           highlighted.push(
-            <span key={i} style={{ backgroundColor: "yellow", color: "black" }}>
+            <span key={i} style={{ backgroundColor: "yellow", color:"black" }}>
               {gotOutput[i] || " "}
             </span>
           );
@@ -384,7 +366,8 @@ bg-gray-800 text-white"
         </div>
       )}
       {/* Editor container */}
-      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden sm:h-[400px]">
+      <div className="editor-container flex border border-gray-300 rounded-md shadow-lg 
+     sm:w-[99%] lg:w-[98%] overflow-hidden mx-auto my-4 items-center justify-center">
         <MonacoEditor
           height="100%"
           width="100%"
