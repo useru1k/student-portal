@@ -3,7 +3,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import Question1 from './Question1';
 import Question2 from './Question2';
 
-const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSignal }) => {
+const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSignal ,showPopup,handleSubmit}) => {
   const initialTimers = [60, 60];
   const [timers, setTimers] = useState(() => {
     const savedTimers = JSON.parse(localStorage.getItem('questionTimers'));
@@ -66,6 +66,15 @@ const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSi
   }, [currentIndex, availableQuestions]);
 
   useEffect(() => {
+
+    const allTimersZero = timers.every((time) => time === 0);
+
+    if (allTimersZero) {
+      showPopup('All questions have expired! Submitting now...');
+      handleSubmit(); // Call the submit function to handle the final submission
+      localStorage.removeItem('questionTimers');
+      window.close(); // Optionally close the window after submission
+    }
     const expiredQuestions = timers
       .map((time, index) => (time === 0 ? index : null))
       .filter((index) => index !== null);
@@ -83,11 +92,11 @@ const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSi
     }
 
     if (remainingQuestions.length === 0) {
-      alert('All questions have expired!');
+      showPopup('All questions have expired!');
       localStorage.removeItem('questionTimers');
       window.close();
     }
-  }, [timers, availableQuestions, currentIndex, setCurrentIndex]);
+  }, [timers, availableQuestions, currentIndex, setCurrentIndex, handleSubmit, showPopup]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
