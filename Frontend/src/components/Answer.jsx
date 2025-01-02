@@ -28,11 +28,13 @@ const Answer = ({
   questionLanguage,
   setShowOutput,
   showOutput,
-  // restartTimer,
+  showPopup,
+  handleSubmit,
+  setTimer
 }) => {
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
-  const [theme, setTheme] = useState("vs-dark");
+  const [theme, setTheme] = useState("vs-dark"); // Code editor theme
   const [customInput, setCustomInput] = useState("");
   const [expectedOutput, setExpectedOutput] = useState("5,10,15");
   const [outputs, setOutputs] = useState([]);
@@ -43,9 +45,9 @@ const Answer = ({
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
-  const [timer, setTimer] = useState(0); // Timer state
+  const timers=localStorage.getItem('questionTimers')
   const prefilledCode = `//your prefilled code example here
-  console.log('hello world')`;
+  print("Hello World")`;
   const languagesArray = [
     { value: "python", label: "Python" },
     { value: "cpp", label: "C++" },
@@ -53,29 +55,25 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const testId = searchParams.get("testId");
+  
   const filteredLanguages =
     questionLanguage === "any"
       ? languagesArray
       : languagesArray.filter((lang) => lang.value === questionLanguage);
 
-  
-
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((prev) => prev + 1); // Increment timer every second
+      setTimer((prev) => prev + 1);
     }, 1000);
 
-    return () => clearInterval(interval); // Clear interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const storedCode =
       codes[currentIndex]?.code || localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
-
+      
     const editorElement = editorRef.current?.container;
     if (editorElement) {
       editorElement.addEventListener("copy", handleCopyPaste);
@@ -113,23 +111,23 @@ const Answer = ({
 
   const disableRightClick = (event) => {
     event.preventDefault();
-    alert("Right-click is disabled.");
+    showPopup("Right-click is disabled.");
   };
 
   const disableDragDrop = (event) => {
     event.preventDefault();
-    alert("Drag-and-drop functionality is disabled.");
+    showPopup("Drag-and-drop functionality is disabled.");
   };
 
   const handleCopyPaste = (event) => {
     event.preventDefault();
-    alert("Copy-Paste functionality is disabled.");
+    showPopup("Copy-Paste functionality is disabled.");
   };
 
   useEffect(() => {
     const handleClipboardEvent = (e) => {
       e.preventDefault();
-      alert(`Clipboard action (${e.type}) is disabled`);
+      showPopup(`Clipboard action (${e.type}) is disabled`);
     };
 
     document.addEventListener("copy", handleClipboardEvent);
@@ -158,12 +156,12 @@ const Answer = ({
         (e.key === "c" || e.key === "x" || e.key === "v" || e.shiftKey)
       ) {
         e.preventDefault();
-        alert("Clipboard actions (copy, cut, paste) are disabled");
+        showPopup("Clipboard actions (copy, cut, paste) are disabled");
       }
 
       if (e.key === "Insert" || (e.key === "Delete" && e.shiftKey)) {
         e.preventDefault();
-        alert("Alternative clipboard actions are disabled");
+        showPopup("Alternative clipboard actions are disabled");
       }
     };
 
@@ -173,7 +171,6 @@ const Answer = ({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
 
   const compileCode = async () => {
      const blacklistedWords = ["function", "while"]; // blackword declartion
@@ -212,17 +209,17 @@ const Answer = ({
     
   
     if (hasBlacklistedWordsOutsidePrint()) {
-      alert(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
+      showPopup(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
       return;
     }
   
     if (!hasAllWhitelistedWords()) {
-      alert(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
+      showPopup(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
       return;
     }
   
     if (!isCommandLineValid()) {
-      alert(`Error: Whitelisted words are not accepted where used in command-line`);
+      showPopup(`Error: Whitelisted words are not accepted where used in command-line`);
       return;
     }
     // If validation passes, proceed with compilation
@@ -276,91 +273,28 @@ const Answer = ({
       setCompilationMessage(`Compilation failed: ${error.message}`);
     }
   };  
-  const handleSubmit = () => {
-    setTimer(0); // Reset timer when clicking Submit
-    const marks = Math.floor(Math.random() * 100);
-    const status = marks >= 50 ? "Pass" : "Fail"; // Basic pass/fail logic
-
-    // restartTimer();
-    setShowOutput(true); // Example logic to show output on submission
-
-    const submission = {
-      marksObtained: marks,
-      submissionDate: new Date().toLocaleString(),
-      question: "Sample Question",
-      answer: "Sample Answer",
-      feedback: "Good job!",
-      status: status,
-    };
-
-    const submissions =
-      JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
-    submissions.push(submission);
-    localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
-
-    navigate(`/finishattempt?testId=${testId}`);
-  };
-
+ 
   const showDifferences = () => {
     if (!showDifference) {
       const highlighted = [];
-      const gotOutput = codes[currentIndex]?.output || "";
-      const gotLines = gotOutput.split("\n"); // Split gotOutput into lines.
-      const expectedLines = expectedOutput.split("\n"); // Split expectedOutput into lines.
-  
-      const maxLines = Math.max(gotLines.length, expectedLines.length);
-  
-      for (let lineIndex = 0; lineIndex < maxLines; lineIndex++) {
-        const gotLine = gotLines[lineIndex] || "";
-        const expectedLine = expectedLines[lineIndex] || "";
-        const maxLength = Math.max(gotLine.length, expectedLine.length);
-  
-        let lineHasDifference = false;
-  
-        // Compare character by character
-        for (let charIndex = 0; charIndex < maxLength; charIndex++) {
-          const gotChar = gotLine[charIndex] || "";
-          const expectedChar = expectedLine[charIndex] || "";
-  
-          if (gotChar === expectedChar) {
-            // Characters match, add to the highlighted array.
-            highlighted.push(<span key={`${lineIndex}-${charIndex}`}>{gotChar || " "}</span>);
-          } else {
-            // Characters differ, highlight the difference.
-            lineHasDifference = true;
-            highlighted.push(
-              <span
-                key={`${lineIndex}-${charIndex}`}
-                style={{ backgroundColor: "yellow", color: "black" }}
-              >
-                {gotChar || " "}
-              </span>
-            );
-          }
-        }
-  
-        // Add a down arrow only at the end of the line where a difference is found.
-        if (lineHasDifference && lineIndex < gotLines.length - 1) {
+      const gotOutput = codes[currentIndex]?.output || ""; 
+      const maxLength = Math.max(expectedOutput.length, gotOutput.length);
+
+      for (let i = 0; i < maxLength; i++) {
+        if (expectedOutput[i] !== gotOutput[i]) {
           highlighted.push(
-            <span
-              key={`arrow-${lineIndex}`}
-              style={{ color: "white", marginLeft: "4px" }}
-            >
-              ↓
+            <span key={i} style={{ backgroundColor: "yellow", color:"black" }}>
+              {gotOutput[i] || " "}
             </span>
           );
+        } else {
+          highlighted.push(<span key={i}>{gotOutput[i] || " "}</span>);
         }
-  
-        // Add a visual line break (for spacing between lines).
-        highlighted.push(<br key={`break-${lineIndex}`} />);
       }
-  
       setHighlightedOutput(highlighted);
     }
     setShowDifference(!showDifference);
   };
-  
-  
 
   return (
     <div className="container mx-auto  flex flex-col  space-y-4 h-full lg:h-[98%]">
@@ -423,7 +357,8 @@ bg-gray-800 text-white"
         </div>
       )}
       {/* Editor container */}
-      <div className="editor-container flex-grow border border-gray-300 rounded-md shadow-lg h-[50%] overflow-hidden sm:h-[400px]">
+      <div className="editor-container flex border border-gray-300 rounded-md shadow-lg 
+     sm:w-[99%] lg:w-[98%] overflow-hidden mx-auto my-4 items-center justify-center">
         <MonacoEditor
           height="100%"
           width="100%"
