@@ -31,10 +31,11 @@ const Answer = ({
   showPopup,
   handleSubmit,
   setTimer
+  // restartTimer,
 }) => {
   const dispatch = useDispatch();
   const codes = useSelector((state) => state.codes.codes);
-  const [theme, setTheme] = useState("vs-dark"); // Code editor theme
+  const [theme, setTheme] = useState("vs-dark");
   const [customInput, setCustomInput] = useState("");
   const [expectedOutput, setExpectedOutput] = useState("5,10,15");
   const [outputs, setOutputs] = useState([]);
@@ -45,9 +46,10 @@ const Answer = ({
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [showPrefilledCode, setShowPrefilledCode] = useState(false);
+  //const [timer, setTimer] = useState(0); // Timer state
   const timers=localStorage.getItem('questionTimers')
   const prefilledCode = `//your prefilled code example here
-  print("Hello World")`;
+  console.log('hello world')`;
   const languagesArray = [
     { value: "python", label: "Python" },
     { value: "cpp", label: "C++" },
@@ -55,25 +57,31 @@ const Answer = ({
     { value: "javascript", label: "JavaScript" },
     { value: "java", label: "Java" },
   ];
+  // const [searchParams] = useSearchParams();
+  // const navigate = useNavigate();                              
   
   const filteredLanguages =
     questionLanguage === "any"
       ? languagesArray
       : languagesArray.filter((lang) => lang.value === questionLanguage);
 
+      
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((prev) => prev + 1);
+      setTimer((prev) => prev + 1); // Increment timer every second
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Clear interval on unmount
   }, []);
 
+  
+  
   useEffect(() => {
     const storedCode =
       codes[currentIndex]?.code || localStorage.getItem(`code_${currentIndex}`);
     setEditorContent(storedCode || code || "");
-      
+    
     const editorElement = editorRef.current?.container;
     if (editorElement) {
       editorElement.addEventListener("copy", handleCopyPaste);
@@ -172,6 +180,7 @@ const Answer = ({
     };
   }, []);
 
+
   const compileCode = async () => {
      const blacklistedWords = ["function", "while"]; // blackword declartion
     const whitelistedWords = ["print", "sum"]; // whiteword declaration
@@ -209,12 +218,12 @@ const Answer = ({
     
   
     if (hasBlacklistedWordsOutsidePrint()) {
-      showPopup(`Error: Code contains prohibited blacklisted words {${blacklistedWords.join(", ")}} outside permitted contexts.`);
+      showPopup(`Error: The code includes restricted words used outside approved contexts.`);
       return;
     }
   
     if (!hasAllWhitelistedWords()) {
-      showPopup(`Error: Code must contain all required whitelisted words {${whitelistedWords.join(", ")}}.`);
+      showPopup(`Error: Ensure the code includes all specified approved words.`);
       return;
     }
   
