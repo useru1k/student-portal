@@ -4,7 +4,7 @@ import Question1 from './Question1';
 import Question2 from './Question2';
 
 const Question = ({ currentIndex, setCurrentIndex, onNext, onPrevious, restartSignal ,showPopup,handleSubmit}) => {
-  const initialTimers = [60, 60];
+  const initialTimers = [9000,9000];
   const [timers, setTimers] = useState(() => {
     const savedTimers = JSON.parse(localStorage.getItem('questionTimers'));
     return savedTimers || initialTimers;
