@@ -17,6 +17,7 @@
     * Task 3 : Get the Environmental Path (Completed) Remark : Can not do in client side but get by API.(No need it runs on server).
     * Task 4 : DB Schema : Question page Schema is Completed. Remark : Need to integrated with client.
     * Task 5 : Html Compare (Partially Completed).
-    * Task 6 : Cpu and memory Monitoring (Completed). Need to make a UI for Display.
+    * Task 6 : Cpu and memory Monitoring (Completed). Need to make a UI for Display. (Completed)
     * Task 7 : Need to get the input from server and compile it.(Completed) Remark : java - newline keyword
-    * Task 8 : Black and White word to compile work (Completed). Remark : white combination eg printsum()
+    * Task 8 : Black and White word to compile work (Completed). Remark : white combination eg printsum() Compeleted
+    * Task 9 : 
