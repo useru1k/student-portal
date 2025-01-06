@@ -34,6 +34,7 @@ const Editor = () => {
       updatedCodes[currentIndex] = newCode;
       return updatedCodes;
     });
+
     //dispatch(updateCode({index:currentIndex,value:newCode}));
   };
     
@@ -59,6 +60,7 @@ const Editor = () => {
     submissions.push(submission);
     localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
     localStorage.removeItem('questionTimers');
+    //localStorage.removeItem('questionsCode')
     navigate(`/finishattempt?testId=${testId}`);
   };
 

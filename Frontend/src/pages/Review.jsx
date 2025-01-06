@@ -1,15 +1,18 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const Review = () => {
   const [searchParams] = useSearchParams();
   const testId = searchParams.get("testId");
-  const fromEditor = searchParams.get("fromEditor") === "true";
-  const dispatch = useDispatch();
-  const codes = useSelector((state) => state.codes.codes);
-  const submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
 
+  const submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`)) || [];
+  const questionsCode = JSON.parse(localStorage.getItem('questionsCode')) || {};
+
+  const handleClose = () => {
+    window.close(); 
+  };
+  
   if (submissions.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -19,12 +22,6 @@ const Review = () => {
       </div>
     );
   }
-
-  const submission = submissions[0];
-
-  const handleClose = () => {
-    window.close(); 
-  };
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -37,63 +34,64 @@ const Review = () => {
               </h1>
               <h3 className="text-lg font-semibold text-gray-700">Question:</h3>
               <p className="mt-2 text-gray-600">
-                {submission.question || "No question available."}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700">Answer:</h3>
-              <p className="mt-2 text-gray-600">
-                {submission.answer || "No answer provided."}
+                {submissions[0]?.question || "No question available."}
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-gray-700">
-                Submitted Codes and Outputs:
+                Last Submitted Code and Output:
               </h3>
-              {codes.length === 0 ? (
+              {Object.keys(questionsCode).length === 0 ? (
                 <p className="mt-2 text-gray-600">No codes available.</p>
               ) : (
-                codes.map((codeItem, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-100 p-4 rounded-md shadow-sm my-4"
-                  >
-                    <h4 className="text-md font-medium text-gray-800">
-                      Code {index + 1}:
-                    </h4>
-                    <pre
-                      className="bg-gray-200 p-2 rounded text-sm text-gray-700 mt-2"
-                      style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
+                Object.keys(questionsCode).map((questionKey) => {
+                  const lastCodeItem = questionsCode[questionKey].at(-1); // Get the last item
+                  return (
+                    <div
+                      key={questionKey}
+                      className="bg-gray-100 p-4 rounded-md shadow-sm my-4"
                     >
-                      {codeItem.code}
-                    </pre>
-                    <h5 className="text-md font-medium text-gray-800 mt-4">
-                      Output:
-                    </h5>
-                    <pre
-                      className="bg-gray-300 p-2 rounded text-sm text-gray-700 mt-2"
-                      style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
-                    >
-                      {codeItem.output}
-                    </pre>
-                  </div>
-                ))
+                      <h4 className="text-md font-medium text-gray-800">
+                        Question {Number(questionKey) + 1}:
+                        Code
+                      </h4>
+                      {lastCodeItem ? (
+                        <>
+                          <pre
+                            className="bg-gray-200 p-2 rounded text-sm text-gray-700 mt-2"
+                            style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
+                          >
+                            {lastCodeItem.code}
+                          </pre>
+                          <h5 className="text-md font-medium text-gray-800 mt-4">
+                            Output:
+                          </h5>
+                          <pre
+                            className="bg-gray-300 p-2 rounded text-sm text-gray-700 mt-2"
+                            style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
+                          >
+                            {lastCodeItem.output}
+                          </pre>
+                        </>
+                      ) : (
+                        <p className="mt-2 text-gray-600">No code available.</p>
+                      )}
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
 
           <div className="mt-8 flex justify-center pb-4">
-  
-    <button
-      className="mt-4 px-4 py-2 bg-gray-500 text-white rounded"
-      onClick={handleClose}
-    >
-      Close
-    </button>
-
-</div>
+            <button
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded"
+              onClick={handleClose}
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
