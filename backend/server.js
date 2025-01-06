@@ -26,7 +26,9 @@ const checkMemoryUsage = async () => {
     console.error("Error checking memory usage:", error);
   }
 };
-
+const sanitizeError = (error) => {
+  return error.replace(/(?:File \".*?\", line \d+|\(.*?:\d+:\d+\)| at .*?\(.*?\))/g, "");
+};
 app.post("/compile", (req, res) => {
   const { code, language, input } = req.body;
   console.log("Received code:", code);
@@ -49,16 +51,17 @@ app.post("/compile", (req, res) => {
     const formattedInput = input.join("\n");
 
     fs.writeFile(filePath, code, (err) => {
-        if (err)
-            return res
-                .status(500)
-                .send("Error writing Python file: " + err.message);
+      if (err) {
+        return res.status(500).send("Error writing Python file: " + err.message);
+      }
+
 
         // Pass the formatted input as stdin to the Python program
         const pythonProcess = exec(`python3 ${filePath}`, (runErr, runStdout, runStderr) => {
-            if (runErr) {
-                return res.status(400).send(`Python Execution Error: ${runStderr}`);
-            }
+          if (runErr) {
+            const sanitizedError = sanitizeError(runStderr);
+            return res.status(400).send(`Python Execution Error: ${sanitizedError}`);
+          }
             res.send(runStdout);
 
             // Cleanup temporary file
@@ -77,8 +80,9 @@ else if (language === "java") {
   const filePath = path.join(__dirname, "code_storage", fileName);
 
   fs.writeFile(filePath, code, (err) => {
-    if (err)
+    if (err) {
       return res.status(500).send("Error writing Java file: " + err.message);
+    }
 
     const classNameMatch = code.match(/public\s+class\s+(\w+)/);
     if (!classNameMatch) {
@@ -103,10 +107,10 @@ else if (language === "java") {
         `javac ${newFilePath}`,
         (compileErr, compileStdout, compileStderr) => {
           if (compileErr) {
-            return res
-              .status(400)
-              .send(`Java Compilation Error: ${compileStderr}`);
+            const sanitizedError = sanitizeError(compileStderr);
+            return res.status(400).send(`Java Compilation Error: ${sanitizedError}`);
           }
+
 
           exec(
             `echo ${formattedInput} | java -cp ${path.join(
@@ -115,9 +119,8 @@ else if (language === "java") {
             )} ${className}`,
             (runErr, runStdout, runStderr) => {
               if (runErr) {
-                return res
-                  .status(400)
-                  .send(`Java Execution Error: ${runStderr}`);
+                const sanitizedError = sanitizeError(runStderr);
+                return res.status(400).send(`Java Execution Error: ${sanitizedError}`);
               }
               res.send(runStdout);
 
@@ -148,25 +151,26 @@ else if (language === "java") {
     const outputFilePath = path.join(__dirname, "code_storage", "a.out");
 
     fs.writeFile(filePath, code, (err) => {
-      if (err)
-        return res.status(500).send("Error writing C file: " + err.message);
-
+      if (err) {
+        return res.status(500).send(`Error writing ${language.toUpperCase()} file: ${err.message}`);
+      }
       // Compile C code
       exec(
         `gcc ${filePath} -o ${outputFilePath}`,
         (compileErr, compileStdout, compileStderr) => {
           if (compileErr) {
-            return res
-              .status(400)
-              .send(`C Compilation Error: ${compileStderr}`);
+            const sanitizedError = sanitizeError(compileStderr);
+            return res.status(400).send(`${language.toUpperCase()} Compilation Error: ${sanitizedError}`);
           }
+  
 
           // Run compiled C program with static input
           exec(
             `echo ${formattedInput} | ${outputFilePath}`,
             (runErr, runStdout, runStderr) => {
               if (runErr) {
-                return res.status(400).send(`C Execution Error: ${runStderr}`);
+                const sanitizedError = sanitizeError(runStderr);
+                return res.status(400).send(`${language.toUpperCase()} Execution Error: ${sanitizedError}`);
               }
               res.send(runStdout);
 
