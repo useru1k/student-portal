@@ -1,6 +1,8 @@
 # Student Portal
 * This project lets students write, compile, and run code in different programming languages to test and see the results.
 * Under Development | Construction
+
+* Need to Finish the Editor Page(Almost Completed need to check testing if) and Admin side Page (Partially).
   
 * FrontEnd
     * Task 1 : Navbar (Completed).
