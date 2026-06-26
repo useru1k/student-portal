@@ -2,8 +2,6 @@
 <p align="center">
 
 ![Status](https://img.shields.io/badge/status-under%20development-orange)
-![Frontend](https://img.shields.io/badge/frontend-completed-green)
-![Backend](https://img.shields.io/badge/backend-partially%20completed-yellow)
 ![React](https://img.shields.io/badge/Frontend-React-blue)
 ![JavaScript](https://img.shields.io/badge/Language-JavaScript-yellow)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-green)
@@ -11,12 +9,10 @@
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
 
 </p>
----
 
-## 📌 Overview
+### 📌 Overview
 A coding platform where students can write, compile, and run code in multiple programming languages to test and see results.
 
----
 ## 📊 Project Progress
 
 * Need to Finish the Editor Page(Almost Completed need to check testing if) and Admin side Page (Partially).
