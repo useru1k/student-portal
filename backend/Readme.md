@@ -6,4 +6,5 @@
 * Task 4 : Fetch Environmental Variable Path (Completed)
 
 * package
+* npm i
 * npm i cors axios express nodemailer dotenv
