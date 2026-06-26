@@ -1,5 +1,15 @@
 # Student Portal
-* This project lets students write, compile, and run code in different programming languages to test and see the results.
+
+![Status](https://img.shields.io/badge/status-under%20development-orange)
+![Frontend](https://img.shields.io/badge/frontend-completed-green)
+![Backend](https://img.shields.io/badge/backend-partially%20completed-yellow)
+
+---
+
+## 📌 Overview
+A coding platform where students can write, compile, and run code in multiple programming languages to test and see results.
+
+---
 * Under Development | Construction
 
 * Need to Finish the Editor Page(Almost Completed need to check testing if) and Admin side Page (Partially).
