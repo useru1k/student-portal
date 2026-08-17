@@ -13,6 +13,8 @@ coverage/
 # Environment variables
 .env
 .env.*
+env
+
 
 # Logs
 *.log
