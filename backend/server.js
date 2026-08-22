@@ -26,9 +26,75 @@ const checkMemoryUsage = async () => {
     console.error("Error checking memory usage:", error);
   }
 };
-const sanitizeError = (error) => {
-  return error.replace(/(?:File \".*?\", line \d+|\(.*?:\d+:\d+\)| at .*?\(.*?\))/g, "");
+// Authentication credentials registry
+const USERS = [
+  {
+    username: "admin",
+    password: "admin123",
+    role: "admin",
+    name: "Karthiban R",
+    id: "ADM001",
+    email: "admin@siet.ac.in",
+  },
+  {
+    username: "user",
+    password: "user123",
+    role: "user",
+    name: "Bharathi",
+    id: "001",
+    email: "bharathi@siet.ac.in",
+  },
+];
+
+const handleAuth = (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Username and password are required.",
+    });
+  }
+
+  const cleanUser = String(username).trim();
+  const cleanPass = String(password).trim();
+
+  const user = USERS.find(
+    (u) =>
+      (u.username.toLowerCase() === cleanUser.toLowerCase() ||
+        (u.email && u.email.toLowerCase() === cleanUser.toLowerCase()) ||
+        (u.id && u.id.toLowerCase() === cleanUser.toLowerCase())) &&
+      u.password === cleanPass
+  );
+
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid credentials. Please verify your username and password.",
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: "Login successful.",
+    role: user.role,
+    user: {
+      username: user.username,
+      name: user.name,
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+    token: `jwt_${user.role}_${Date.now()}`,
+  });
 };
+
+app.post("/api/login", handleAuth);
+app.post("/login", handleAuth);
+
+const sanitizeError = (error) => {
+  return (error || "").replace(/(?:File \".*?\", line \d+|\(.*?:\d+:\d+\)| at .*?\(.*?\))/g, "");
+};
+
 app.post("/compile", (req, res) => {
   const { code, language, input } = req.body;
   console.log("Received code:", code);
