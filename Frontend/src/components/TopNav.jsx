@@ -21,6 +21,7 @@ const TopNav = ({ isSideNavOpen, toggleSideNav, studentName = 'Bharathi', studen
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('portalUser');
     navigate('/');
   };
 

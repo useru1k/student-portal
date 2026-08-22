@@ -20,6 +20,7 @@ const A_TopNav = ({ isSideNavOpen, toggleSideNav, adminName = 'Karthiban R', adm
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('portalUser');
     navigate('/');
   };
 

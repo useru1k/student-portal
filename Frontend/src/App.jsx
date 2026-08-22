@@ -28,7 +28,9 @@ const App = () => {
 
   const handleLogout = () => {
     setUserRole(null);
-    localStorage.removeItem('userRole'); // Clear user role from local storage
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('portalUser');
   };
 
   return (
